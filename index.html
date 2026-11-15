@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>나무 막대기 용사전 3D - 멀티플레이어</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>나무 막대기 용사전 3D</title>
   <style>
     * {
       box-sizing: border-box;
@@ -108,9 +111,7 @@
       user-select: text;
       -webkit-user-select: text;
     }
-    .login-box input:focus {
-      border-color: #ffd54f;
-    }
+    .login-box input:focus { border-color: #ffd54f; }
     #nickname-error {
       color: #ff6b6b;
       font-size: 13px;
@@ -144,23 +145,28 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 14px 18px;
+      padding: 12px 16px;
       width: 100%;
+    }
+    .top-right-group {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
     }
     .hud-btn {
       pointer-events: auto;
-      background: rgba(20, 28, 45, 0.85);
-      border: 2px solid rgba(255, 255, 255, 0.28);
+      background: rgba(20, 28, 45, 0.88);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       color: #fff;
-      padding: 10px 16px;
+      padding: 9px 14px;
       border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
     .hud-btn:active { transform: scale(0.95); }
 
@@ -171,9 +177,9 @@
       gap: 6px;
     }
     .exp-box {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(255,255,255,0.25);
-      padding: 6px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       color: #fff;
       font-size: 13px;
@@ -181,12 +187,12 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.45);
     }
     .exp-bar-bg {
-      width: 120px;
+      width: 110px;
       height: 8px;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.18);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -197,17 +203,36 @@
       transition: width 0.25s;
     }
 
+    /* 맵 끝 "제작중..." 고정 배너 */
+    #wip-banner {
+      display: none;
+      position: fixed;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(220, 38, 38, 0.92);
+      border: 2px solid #fef08a;
+      color: #fff;
+      padding: 8px 24px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.55);
+      z-index: 320;
+    }
+
     #toast-msg {
       position: fixed;
-      top: 72px;
+      top: 96px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.95);
       border: 2px solid #ffd54f;
       color: #fff;
-      padding: 10px 22px;
+      padding: 9px 20px;
       border-radius: 14px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
       opacity: 0;
@@ -215,7 +240,7 @@
       transition: opacity 0.25s, transform 0.25s;
       z-index: 300;
       white-space: nowrap;
-      max-width: 90%;
+      max-width: 92%;
       text-align: center;
     }
     #toast-msg.show {
@@ -226,19 +251,19 @@
     .modal-panel {
       display: none;
       position: fixed;
-      top: 64px;
-      background: rgba(18, 25, 40, 0.95);
-      border: 2px solid rgba(255,255,255,0.25);
+      top: 60px;
+      background: rgba(18, 25, 40, 0.96);
+      border: 2px solid rgba(255,255,255,0.28);
       border-radius: 16px;
       padding: 18px;
-      width: 280px;
+      width: 300px;
       color: #fff;
       pointer-events: auto;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.65);
       z-index: 250;
     }
-    #inventory-panel { left: 18px; }
-    #char-panel { right: 18px; }
+    #inventory-panel { left: 16px; }
+    #guide-panel { right: 16px; width: 320px; }
     .panel-header {
       display: flex;
       justify-content: space-between;
@@ -251,6 +276,22 @@
       color: #ffd54f;
     }
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; }
+    
+    /* 인벤토리 코인 바 */
+    .coin-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid #f59e0b;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #fde047;
+    }
+
     .item-slot {
       display: flex;
       align-items: center;
@@ -270,45 +311,49 @@
     .item-info h4 { font-size: 14px; color: #fff; margin-bottom: 3px; }
     .item-info p { font-size: 12px; color: #fbbf24; font-weight: 700; }
 
-    .char-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .char-option {
-      background: rgba(255,255,255,0.08);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      padding: 10px;
-      color: #fff;
+    /* 게임 가이드 리스트 */
+    .guide-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
+      line-height: 1.45;
+      color: #e2e8f0;
     }
-    .char-option.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); }
+    .guide-list li {
+      background: rgba(255,255,255,0.07);
+      padding: 8px 11px;
+      border-radius: 9px;
+      border-left: 3px solid #38bdf8;
+      font-weight: 600;
+    }
 
     /* 좌측 이동 조이스틱 */
     #move-joystick-zone {
       position: fixed;
       left: 28px;
-      bottom: 28px;
-      width: 130px;
-      height: 130px;
+      bottom: 26px;
+      width: 134px;
+      height: 134px;
       pointer-events: auto;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .joystick-base {
-      width: 116px; height: 116px;
+      width: 118px; height: 118px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.14);
-      border: 2px solid rgba(255, 255, 255, 0.35);
+      background: rgba(56, 189, 248, 0.16);
+      border: 2px solid rgba(125, 211, 252, 0.45);
       position: relative;
       display: flex; align-items: center; justify-content: center;
     }
     #move-stick {
       width: 48px; height: 48px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
       position: absolute;
       transform: translate(0px, 0px);
     }
@@ -316,17 +361,17 @@
     /* 우측 공격 조이스틱 */
     #attack-joystick-zone {
       position: fixed;
-      right: 32px;
-      bottom: 32px;
-      width: 120px;
-      height: 120px;
+      right: 30px;
+      bottom: 26px;
+      width: 134px;
+      height: 134px;
       pointer-events: auto;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     #attack-stick-base {
-      width: 108px; height: 108px;
+      width: 118px; height: 118px;
       border-radius: 50%;
       background: rgba(239, 68, 68, 0.22);
       border: 3px solid rgba(248, 113, 113, 0.65);
@@ -334,19 +379,20 @@
       position: relative;
     }
     #attack-stick {
-      width: 64px; height: 64px;
+      width: 58px; height: 58px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #f87171, #dc2626);
       border: 2px solid #fff;
       color: #fff;
       font-weight: 900;
-      font-size: 15px;
+      font-size: 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       box-shadow: 0 6px 18px rgba(220, 38, 38, 0.55);
-      cursor: pointer;
+      position: absolute;
+      transform: translate(0px, 0px);
     }
 
     /* 3D 오브젝트 위 플로팅 라벨 */
@@ -363,32 +409,51 @@
       white-space: nowrap;
       text-align: center;
       font-weight: 800;
-      text-shadow: 0 1px 4px #000, 0 0 2px #000;
+      text-shadow: 0 1px 3px #000, 0 0 2px #000;
     }
     .player-tag {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
     }
     .player-name-badge {
       color: #fff;
       font-size: 13px;
-      background: rgba(0, 0, 0, 0.65);
-      padding: 3px 9px;
+      background: rgba(0, 0, 0, 0.68);
+      padding: 2px 9px;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.3);
     }
     .player-name-badge span { color: #ffd54f; margin-left: 4px; }
+    
+    /* 내 캐릭터 초록색 체력 바 + 가운데 HP 텍스트 */
     .player-hp-bar {
-      width: 50px;
-      height: 5px;
-      background: rgba(0,0,0,0.7);
-      border: 1px solid #fff;
-      border-radius: 3px;
+      position: relative;
+      width: 78px;
+      height: 14px;
+      background: rgba(0, 0, 0, 0.78);
+      border: 1.5px solid #fff;
+      border-radius: 6px;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .player-hp-fill { height: 100%; background: #ef4444; transition: width 0.15s; }
+    .player-hp-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: #22c55e;
+      transition: width 0.15s;
+    }
+    .player-hp-text {
+      position: relative;
+      z-index: 2;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      text-shadow: 0 1px 2px #000;
+    }
 
     .slime-tag {
       display: flex;
@@ -398,10 +463,10 @@
     }
     .slime-hp-text { color: #a7f3d0; font-size: 11px; }
     .slime-hp-bar {
-      width: 44px; height: 6px;
-      background: rgba(0,0,0,0.7);
+      width: 48px; height: 7px;
+      background: rgba(0,0,0,0.75);
       border: 1px solid #fff;
-      border-radius: 3px;
+      border-radius: 4px;
       overflow: hidden;
     }
     .slime-hp-fill { height: 100%; background: #22c55e; transition: width 0.15s; }
@@ -409,17 +474,17 @@
     .npc-tag {
       color: #fde047;
       font-size: 12px;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       padding: 3px 10px;
       border-radius: 8px;
       cursor: pointer;
       pointer-events: auto;
-      border: 1px solid #fde047;
+      border: 1.5px solid #fde047;
     }
     .guard-tag {
       color: #fde047;
       font-size: 12px;
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.78);
       padding: 2px 8px;
       border-radius: 8px;
       cursor: pointer;
@@ -458,9 +523,9 @@
       <p>왕국을 탐험하고 왼쪽 사냥터의 슬라임을 물리치세요!</p>
       <input type="text" id="nickname-input" maxlength="12" placeholder="사용할 닉네임 입력 (2~12자)" autocomplete="off" />
       <div id="nickname-error"></div>
-      <button class="start-btn" id="start-game-btn">모험 시작하기</button>
+      <button class="start-btn" id="start-game-btn">모험 시작하기 (전체화면)</button>
       <p style="margin-top:12px; font-size:11px; color:#94a3b8;">
-        ※ 이미 사용 중인 닉네임은 사용할 수 없습니다.
+        ※ 한 번 정한 닉네임은 자동 저장되며, 중복된 이름은 사용할 수 없습니다.
       </p>
     </div>
   </div>
@@ -468,6 +533,7 @@
   <!-- 3D 캔버스 및 라벨 레이어 -->
   <div id="game-container"></div>
   <div id="floating-labels"></div>
+  <div id="wip-banner">🚧 제작중...</div>
   <div id="toast-msg"></div>
 
   <!-- 인게임 HUD -->
@@ -476,17 +542,20 @@
       <!-- 왼쪽 위: 인벤토리 -->
       <button class="hud-btn" id="btn-inventory">🎒 인벤토리</button>
 
-      <!-- 중앙: 레벨 및 슬라임 현황 -->
+      <!-- 중앙: 레벨 및 슬라임 퀘스트 현황 -->
       <div class="center-status">
         <div class="exp-box">
-          <span id="hud-lv">Lv.1</span>
+          <span id="hud-lv">Lv.1 / 50</span>
           <div class="exp-bar-bg"><div class="exp-bar-fill" id="hud-exp-bar"></div></div>
-          <span id="hud-slime-count">슬라임: 0/5 (처치 퀘스트)</span>
+          <span id="hud-slime-count">처치: 0/5</span>
         </div>
       </div>
 
-      <!-- 오른쪽 위: 내 캐릭터 정하기 -->
-      <button class="hud-btn" id="btn-char">🧙 내 캐릭터</button>
+      <!-- 오른쪽 위: 전체화면 & 게임 가이드 -->
+      <div class="top-right-group">
+        <button class="hud-btn" id="btn-fullscreen" title="전체화면으로 보기">⛶ 전체화면</button>
+        <button class="hud-btn" id="btn-guide">📖 게임 가이드</button>
+      </div>
     </div>
 
     <!-- 인벤토리 창 -->
@@ -494,6 +563,10 @@
       <div class="panel-header">
         <span>🎒 내 인벤토리</span>
         <button class="close-btn" onclick="closePanels()">✕</button>
+      </div>
+      <div class="coin-header-bar">
+        <span>💲 보유 코인</span>
+        <span id="coin-count-text">0 코인</span>
       </div>
       <div class="item-slot">
         <div class="item-icon">🪵</div>
@@ -503,22 +576,23 @@
         </div>
       </div>
       <p style="font-size:11px; color:#94a3b8; margin-top:10px;">
-        우측 공격 조이스틱을 당기거나 누르면 브롤스타즈처럼 조준 방향으로 공격합니다.
+        슬라임을 처치하면 70% 확률로 1 코인을 획득합니다!
       </p>
     </div>
 
-    <!-- 내 캐릭터 선택 창 -->
-    <div class="modal-panel" id="char-panel">
+    <!-- 게임 가이드 창 -->
+    <div class="modal-panel" id="guide-panel">
       <div class="panel-header">
-        <span>🧙 내 캐릭터 선택</span>
+        <span>📖 게임 가이드</span>
         <button class="close-btn" onclick="closePanels()">✕</button>
       </div>
-      <div class="char-grid">
-        <button class="char-option active" data-style="knight">🛡️ 왕국 견습생</button>
-        <button class="char-option" data-style="mage">🔮 푸른 마법사</button>
-        <button class="char-option" data-style="ranger">🌿 숲의 탐험가</button>
-        <button class="char-option" data-style="dark">🔥 붉은 전사</button>
-      </div>
+      <ul class="guide-list">
+        <li>1. 왼쪽 조이스틱은 이동</li>
+        <li>2. 오른쪽 조이스틱은 공격 (방향 드래그 후 떼기)</li>
+        <li>3. 최대 레벨 50</li>
+        <li>4. 10레벨 부터 전직할수있다</li>
+        <li>5. 가이드에 따라 레벨업 하기</li>
+      </ul>
     </div>
 
     <!-- 왼쪽 아래: 이동 조이스틱 -->
@@ -540,6 +614,27 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     // ==========================================
+    // 0. 브라우저 상단 주소창/하단 바 숨기기 (전체화면)
+    // ==========================================
+    function requestFullScreenMode() {
+      const docEl = document.documentElement;
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+      if (req && !document.fullscreenElement) {
+        req.call(docEl).then(() => {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+        }).catch(() => {});
+      }
+      window.scrollTo(0, 1);
+    }
+
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      requestFullScreenMode();
+      showToast('🖥️ 전체화면 모드를 활성화했습니다.');
+    });
+
+    // ==========================================
     // 1. 사운드 및 배경음악 (Web Audio API)
     // ==========================================
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -552,10 +647,9 @@
       startBGM();
     }
 
-    // 배경음악 (은은한 판타지 멜로디 반복 재생)
     function startBGM() {
       if (bgmInterval || !audioCtx) return;
-      const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63]; // 도, 미, 솔, 높은도...
+      const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
       let idx = 0;
       bgmInterval = setInterval(() => {
         if (!audioCtx || audioCtx.state !== 'running') return;
@@ -566,7 +660,7 @@
         idx++;
 
         const t = audioCtx.currentTime;
-        gain.gain.setValueAtTime(0.04, t);
+        gain.gain.setValueAtTime(0.035, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
 
         osc.connect(gain);
@@ -576,7 +670,6 @@
       }, 700);
     }
 
-    // 풀 밟는 소리
     let lastStepTime = 0;
     function playGrassStepSound() {
       const now = performance.now();
@@ -609,7 +702,6 @@
       noise.start();
     }
 
-    // 나무 막대기 스윙 소리
     function playStickSwingSound() {
       if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
@@ -628,7 +720,25 @@
       osc.stop(t + 0.16);
     }
 
-    // 슬라임 타격음
+    // 슬라임 통통 & 피격 효과음
+    function playSlimeBounceSound() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      const t = audioCtx.currentTime;
+      osc.frequency.setValueAtTime(190, t);
+      osc.frequency.exponentialRampToValueAtTime(420, t + 0.12);
+
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.005, t + 0.13);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.14);
+    }
+
     function playSlimeHitSound() {
       if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
@@ -636,10 +746,10 @@
       osc.type = 'sine';
       const t = audioCtx.currentTime;
       osc.frequency.setValueAtTime(260, t);
-      osc.frequency.exponentialRampToValueAtTime(540, t + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(560, t + 0.08);
       osc.frequency.exponentialRampToValueAtTime(150, t + 0.18);
 
-      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.setValueAtTime(0.32, t);
       gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
 
       osc.connect(gain);
@@ -649,10 +759,11 @@
     }
 
     // ==========================================
-    // 2. 닉네임 자동 저장 및 로드
+    // 2. 닉네임 자동 저장 및 상태 관리
     // ==========================================
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
+    const COINS_KEY = 'kingdom_3d_player_coins';
 
     function getSavedNickname() {
       return localStorage.getItem(STORAGE_KEY) || '';
@@ -662,15 +773,16 @@
       started: false,
       nickname: '',
       level: 1,
+      maxLevel: 50,
       exp: 0,
       maxExp: 15,
       damage: 1,
       hp: 15,
       maxHp: 15,
-      charStyle: 'knight',
+      coins: parseInt(localStorage.getItem(COINS_KEY) || '0', 10),
       isAttacking: false,
       attackTimer: 0,
-      questProgress: 0, // 5마리 처치 퀘스트
+      questProgress: 0,
       questCompleted: false
     };
 
@@ -683,24 +795,38 @@
       toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 2800);
     }
 
-    // 자동 로그인 체크
+    function updateCoinUI() {
+      document.getElementById('coin-count-text').textContent = `${state.coins} 코인`;
+      localStorage.setItem(COINS_KEY, String(state.coins));
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      updateCoinUI();
       const savedName = getSavedNickname();
       if (savedName) {
         state.nickname = savedName;
         state.started = true;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('hud').style.display = 'block';
-        initAudio();
+        updatePlayerUI();
         initMultiplayer();
-        showToast(`환영합니다, ${state.nickname}님! (자동 로그인)`);
+        showToast(`환영합니다, ${state.nickname}님! 화면을 터치하면 전체화면으로 전환됩니다.`);
       } else {
         document.getElementById('login-screen').style.display = 'flex';
       }
     });
 
+    // 첫 화면 터치 시 자동 전체화면 및 오디오 활성화
+    window.addEventListener('pointerdown', () => {
+      if (state.started) {
+        initAudio();
+        requestFullScreenMode();
+      }
+    }, { once: true });
+
     document.getElementById('start-game-btn').addEventListener('click', () => {
       initAudio();
+      requestFullScreenMode();
       const input = document.getElementById('nickname-input');
       const errEl = document.getElementById('nickname-error');
       const raw = input.value.trim();
@@ -731,92 +857,172 @@
     });
 
     // ==========================================
-    // 3. Three.js 3D 월드 구축 (브롤스타즈 쿼터뷰)
+    // 3. Three.js 3D 월드 구축 (4번째 사진 브롤스타즈 구도)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.Fog(0x87ceeb, 45, 110);
+    scene.fog = new THREE.Fog(0x87ceeb, 55, 135);
 
-    // 카메라 (위에서 아래로 내려다보는 쿼터뷰)
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 250);
+    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 260);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xfff5e4, 0.85);
-    dirLight.position.set(25, 45, 30);
+    dirLight.position.set(25, 50, 30);
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    // 바닥
-    const groundGeo = new THREE.PlaneGeometry(200, 150);
-    const groundMat = new THREE.MeshLambertMaterial({ color: 0x4caf50 });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
+    // 맵 경계 상수 (끝에 닿으면 "제작중..." 표시)
+    const MAP_MIN_X = -115;
+    const MAP_MAX_X = 50;
+    const MAP_MIN_Z = -32;
+    const MAP_MAX_Z = 32;
+
+    // 바닥 초원
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(180, 80),
+      new THREE.MeshLambertMaterial({ color: 0x4caf50 })
+    );
     ground.rotation.x = -Math.PI / 2;
+    ground.position.set(-32, 0, 0);
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // 슬라임 사냥터 (3배 더 왼쪽으로 이동, X: -60 ~ -110)
-    const huntZoneGeo = new THREE.PlaneGeometry(45, 45);
-    const huntZoneMat = new THREE.MeshLambertMaterial({ color: 0x3d9942 });
-    const huntZone = new THREE.Mesh(huntZoneGeo, huntZoneMat);
+    // 맵 테두리 울타리 (끝 경계 시각화)
+    const borderMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    const topWall = new THREE.Mesh(new THREE.BoxGeometry(170, 1.5, 1), borderMat);
+    topWall.position.set(-32, 0.75, MAP_MIN_Z - 1);
+    scene.add(topWall);
+
+    const bottomWall = new THREE.Mesh(new THREE.BoxGeometry(170, 1.5, 1), borderMat);
+    bottomWall.position.set(-32, 0.75, MAP_MAX_Z + 1);
+    scene.add(bottomWall);
+
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 68), borderMat);
+    leftWall.position.set(MAP_MIN_X - 1, 0.75, 0);
+    scene.add(leftWall);
+
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 68), borderMat);
+    rightWall.position.set(MAP_MAX_X + 1, 0.75, 0);
+    scene.add(rightWall);
+
+    // 슬라임 사냥터 영역 (왼쪽 X: -65 ~ -110)
+    const huntZone = new THREE.Mesh(
+      new THREE.PlaneGeometry(46, 48),
+      new THREE.MeshLambertMaterial({ color: 0x3b9440 })
+    );
     huntZone.rotation.x = -Math.PI / 2;
-    huntZone.position.set(-85, 0.02, 2);
+    huntZone.position.set(-88, 0.02, 0);
     scene.add(huntZone);
 
     // 왕국 앞 돌길
-    const roadGeo = new THREE.Mesh(new THREE.PlaneGeometry(12, 22), new THREE.MeshLambertMaterial({ color: 0xd6cfc2 }));
-    roadGeo.rotation.x = -Math.PI / 2;
-    roadGeo.position.set(0, 0.03, 6);
-    scene.add(roadGeo);
+    const road = new THREE.Mesh(
+      new THREE.PlaneGeometry(14, 24),
+      new THREE.MeshLambertMaterial({ color: 0xe5dec9 })
+    );
+    road.rotation.x = -Math.PI / 2;
+    road.position.set(0, 0.03, 7);
+    scene.add(road);
 
     // ==========================================
-    // 4. 왕국 2배 확대 구축
+    // 3-2. 진짜 입체 3D 풀(잔디 뭉치) 대량 생성
+    // ==========================================
+    const grassBladeGeo = new THREE.ConeGeometry(0.18, 0.85, 4);
+    const grassMat1 = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
+    const grassMat2 = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
+
+    for (let i = 0; i < 340; i++) {
+      const gx = MAP_MIN_X + 3 + Math.random() * (MAP_MAX_X - MAP_MIN_X - 6);
+      const gz = MAP_MIN_Z + 3 + Math.random() * (MAP_MAX_Z - MAP_MIN_Z - 6);
+      // 왕국 내부 및 돌길 제외
+      if (gx > -14 && gx < 14 && gz > -24 && gz < 16) continue;
+
+      const tuft = new THREE.Group();
+      for (let b = 0; b < 5; b++) {
+        const blade = new THREE.Mesh(grassBladeGeo, b % 2 === 0 ? grassMat1 : grassMat2);
+        const angle = (b / 5) * Math.PI * 2;
+        blade.position.set(Math.cos(angle) * 0.22, 0.4, Math.sin(angle) * 0.22);
+        blade.rotation.z = Math.cos(angle) * 0.28;
+        blade.rotation.x = Math.sin(angle) * 0.28;
+        tuft.add(blade);
+      }
+      tuft.position.set(gx, 0, gz);
+      scene.add(tuft);
+    }
+
+    // ==========================================
+    // 4. 진짜 왕국 (기존보다 1.5배 더 크게 + 화려한 황금 성문)
     // ==========================================
     const kingdomGroup = new THREE.Group();
-    kingdomGroup.position.set(0, 0, -10);
-    kingdomGroup.scale.set(2, 2, 2); // 왕국 2배 크기
+    kingdomGroup.position.set(0, 0, -14);
+    kingdomGroup.scale.set(3.0, 3.0, 3.0); // 기존 2배에서 1.5배 더 커진 3배 스케일
 
-    const stoneMat = new THREE.MeshLambertMaterial({ color: 0xe2e8f0 });
-    const roofMat = new THREE.MeshLambertMaterial({ color: 0x2563eb });
-    const doorMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+    const stoneMat = new THREE.MeshLambertMaterial({ color: 0xf1f5f9 });
+    const trimMat = new THREE.MeshLambertMaterial({ color: 0xcbd5e1 });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.6, roughness: 0.25 });
 
-    const mainCastle = new THREE.Mesh(new THREE.BoxGeometry(12, 7, 8), stoneMat);
-    mainCastle.position.set(0, 3.5, 0);
+    // 성 본관 & 성벽
+    const mainCastle = new THREE.Mesh(new THREE.BoxGeometry(11, 6.5, 7), stoneMat);
+    mainCastle.position.set(0, 3.25, 0);
     mainCastle.castShadow = true;
     kingdomGroup.add(mainCastle);
 
-    const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(7.5, 4, 4), roofMat);
-    mainRoof.position.set(0, 9, 0);
+    // 성벽 상단 요철(성가퀴)
+    for (let cx = -4.8; cx <= 4.8; cx += 1.6) {
+      const battlement = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.8, 0.6), trimMat);
+      battlement.position.set(cx, 6.8, 3.3);
+      kingdomGroup.add(battlement);
+    }
+
+    // 중앙 지붕 & 왕관 장식
+    const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(6.8, 3.8, 4), roofMat);
+    mainRoof.position.set(0, 8.4, 0);
     mainRoof.rotation.y = Math.PI / 4;
     kingdomGroup.add(mainRoof);
 
-    [-6.5, 6.5].forEach(xPos => {
-      const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 2, 9, 12), stoneMat);
-      tower.position.set(xPos, 4.5, 2);
+    // 좌우 웅장한 쌍둥이 성탑
+    [-6.2, 6.2].forEach(xPos => {
+      const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.9, 8.8, 16), stoneMat);
+      tower.position.set(xPos, 4.4, 1.8);
       kingdomGroup.add(tower);
 
-      const tRoof = new THREE.Mesh(new THREE.ConeGeometry(2.3, 3.2, 12), roofMat);
-      tRoof.position.set(xPos, 10.5, 2);
+      const tRoof = new THREE.Mesh(new THREE.ConeGeometry(2.2, 3.2, 16), roofMat);
+      tRoof.position.set(xPos, 10.3, 1.8);
       kingdomGroup.add(tRoof);
+
+      // 탑 꼭대기 황금 첨탑
+      const spire = new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 10), goldMat);
+      spire.position.set(xPos, 12.0, 1.8);
+      kingdomGroup.add(spire);
     });
 
-    const gate = new THREE.Mesh(new THREE.BoxGeometry(3.4, 4.2, 0.6), doorMat);
-    gate.position.set(0, 2.1, 4.1);
-    kingdomGroup.add(gate);
+    // 황금 성문 아치 프레임 & 황금 대문
+    const archFrame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.8, 0.8), goldMat);
+    archFrame.position.set(0, 2.4, 3.45);
+    kingdomGroup.add(archFrame);
+
+    const goldGateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
+    goldGateLeft.position.set(-0.92, 2.1, 3.52);
+    kingdomGroup.add(goldGateLeft);
+
+    const goldGateRight = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
+    goldGateRight.position.set(0.92, 2.1, 3.52);
+    kingdomGroup.add(goldGateRight);
 
     scene.add(kingdomGroup);
 
     // ==========================================
-    // 5. 경비원 & 가이드 NPC (왕국 오른쪽)
+    // 5. 경비원 2명 & 가이드 NPC (이름: 가이드 NPC)
     // ==========================================
-    const clickableGuards = [];
+    const clickableNPCs = [];
     const labelsData = [];
 
     function createGuard(x, z) {
@@ -837,10 +1043,10 @@
 
       scene.add(g);
 
-      const hitBox = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), new THREE.MeshBasicMaterial({ visible: false }));
+      const hitBox = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.2, 1.8), new THREE.MeshBasicMaterial({ visible: false }));
       hitBox.position.set(x, 1.5, z);
       scene.add(hitBox);
-      clickableGuards.push({ mesh: hitBox, type: 'guard' });
+      clickableNPCs.push({ mesh: hitBox, type: 'guard' });
 
       const tag = document.createElement('div');
       tag.className = 'float-tag guard-tag';
@@ -850,49 +1056,48 @@
       labelsData.push({ obj: g, el: tag, offset: 2.75 });
     }
 
-    createGuard(-5.5, -2.5);
-    createGuard(5.5, -2.5);
+    createGuard(-7.5, -2.0);
+    createGuard(7.5, -2.0);
 
-    // 가이드 NPC (할아버지 캐릭터) 및 표지판 (왕국 오른쪽)
+    // 왕국 오른쪽 가이드 NPC (이름: 가이드 NPC)
     const guideGroup = new THREE.Group();
-    guideGroup.position.set(11, 0, -2);
+    guideGroup.position.set(14, 0, -1.5);
 
-    // 할아버지 NPC 바디
-    const gBody = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 1.2, 12), new THREE.MeshLambertMaterial({ color: 0xb45309 }));
-    gBody.position.y = 0.75;
+    const gBody = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 1.25, 12), new THREE.MeshLambertMaterial({ color: 0xb45309 }));
+    gBody.position.y = 0.78;
     guideGroup.add(gBody);
 
-    const gHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 14), new THREE.MeshLambertMaterial({ color: 0xfef08a }));
-    gHead.position.y = 1.7;
+    const gHead = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), new THREE.MeshLambertMaterial({ color: 0xfef08a }));
+    gHead.position.y = 1.72;
     guideGroup.add(gHead);
 
-    const gHat = new THREE.Mesh(new THREE.ConeGeometry(0.45, 0.35, 12), new THREE.MeshLambertMaterial({ color: 0xd97706 }));
-    gHat.position.y = 2.05;
+    const gHat = new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.4, 12), new THREE.MeshLambertMaterial({ color: 0xd97706 }));
+    gHat.position.y = 2.1;
     guideGroup.add(gHat);
     scene.add(guideGroup);
 
-    const guideHitBox = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), new THREE.MeshBasicMaterial({ visible: false }));
-    guideHitBox.position.set(11, 1.5, -2);
+    const guideHitBox = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.2, 1.8), new THREE.MeshBasicMaterial({ visible: false }));
+    guideHitBox.position.set(14, 1.5, -1.5);
     scene.add(guideHitBox);
-    clickableGuards.push({ mesh: guideHitBox, type: 'guide' });
+    clickableNPCs.push({ mesh: guideHitBox, type: 'guide' });
 
     const guideTag = document.createElement('div');
     guideTag.className = 'float-tag npc-tag';
-    guideTag.textContent = '👴 가이드 (클릭)';
+    guideTag.textContent = '가이드 NPC';
     guideTag.addEventListener('click', () => {
       if (!state.questCompleted) {
-        showToast('👴 가이드: "왼쪽 사냥터에서 1레벨부터 5레벨까지 슬라임을 잡고 오거라!"');
+        showToast('가이드 NPC: "1레벨부터 5레벨까지 슬라임을 잡으세요! 잡을 때까지 슬라임을 처치하세요!"');
       } else {
-        showToast('👴 가이드: "좋아! 잘했어!"');
+        showToast('가이드 NPC: "좋아! 잘했어!"');
       }
     });
     document.getElementById('floating-labels').appendChild(guideTag);
-    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.5 });
+    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55 });
 
-    // 왕국 오른쪽 표지판 ("가이드")
+    // 오른쪽 표지판 ("가이드")
     function createRightSign() {
       const signGroup = new THREE.Group();
-      signGroup.position.set(15, 0, -2);
+      signGroup.position.set(18.5, 0, -1.5);
 
       const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.2, 8), new THREE.MeshLambertMaterial({ color: 0x5c3a21 }));
       post.position.y = 1.1;
@@ -903,7 +1108,7 @@
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#8b5a2b'; ctx.fillRect(0, 0, 384, 192);
       ctx.strokeStyle = '#4a2e14'; ctx.lineWidth = 14; ctx.strokeRect(6, 6, 372, 180);
-      ctx.fillStyle = '#fde047'; ctx.font = 'bold 52px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#fde047'; ctx.font = 'bold 54px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('📖 가이드', 192, 115);
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -914,10 +1119,10 @@
     }
     createRightSign();
 
-    // 왕국 왼쪽 사냥터 표지판
+    // 왼쪽 사냥터 표지판
     function createLeftSign() {
       const signGroup = new THREE.Group();
-      signGroup.position.set(-22, 0, -2);
+      signGroup.position.set(-24, 0, -1.5);
 
       const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.2, 8), new THREE.MeshLambertMaterial({ color: 0x5c3a21 }));
       post.position.y = 1.1;
@@ -929,9 +1134,9 @@
       ctx.fillStyle = '#8b5a2b'; ctx.fillRect(0, 0, 512, 256);
       ctx.strokeStyle = '#4a2e14'; ctx.lineWidth = 16; ctx.strokeRect(8, 8, 496, 240);
       ctx.fillStyle = '#fffbeb'; ctx.font = 'bold 44px sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('⬅️ 1~5렙 슬라임 사냥터', 256, 115);
+      ctx.fillText('⬅️ 1~10렙 슬라임 사냥터', 256, 115);
       ctx.font = 'bold 28px sans-serif'; ctx.fillStyle = '#fde047';
-      ctx.fillText('(처치 퀘스트 지역)', 256, 175);
+      ctx.fillText('(슬라임 처치 퀘스트 지역)', 256, 175);
 
       const tex = new THREE.CanvasTexture(canvas);
       const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.6, 0.2), new THREE.MeshLambertMaterial({ map: tex }));
@@ -941,36 +1146,11 @@
     }
     createLeftSign();
 
-    // 클릭/터치 이벤트 (경비원 및 가이드)
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    renderer.domElement.addEventListener('pointerdown', (e) => {
-      if (!state.started) return;
-      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects(clickableGuards.map(g => g.mesh));
-      if (hits.length > 0) {
-        const found = clickableGuards.find(g => g.mesh === hits[0].object);
-        if (found) {
-          if (found.type === 'guard') {
-            showToast('🛡️ 경비원: "왕국을 지키는 경비원"');
-          } else if (found.type === 'guide') {
-            if (!state.questCompleted) {
-              showToast('👴 가이드: "왼쪽 사냥터에서 슬라임을 잡고 오거라!"');
-            } else {
-              showToast('👴 가이드: "좋아! 잘했어!"');
-            }
-          }
-        }
-      }
-    });
-
     // ==========================================
-    // 6. 내 캐릭터 및 나무 막대기 (공격 조준선 포함)
+    // 6. 내 캐릭터 & 브롤스타즈 스타일 공격 조준선
     // ==========================================
     const playerGroup = new THREE.Group();
-    playerGroup.position.set(0, 0, 8);
+    playerGroup.position.set(0, 0, 9);
     scene.add(playerGroup);
 
     const bodyMat = new THREE.MeshLambertMaterial({ color: 0x3b82f6 });
@@ -997,50 +1177,50 @@
     stickMesh.position.set(0, 0.45, 0.35); stickMesh.rotation.x = Math.PI / 3; stickMesh.castShadow = true;
     weaponPivot.add(stickMesh);
 
-    // 브롤스타즈 스타일 공격 조준선 (부채꼴 레이저 이펙트)
-    const aimGuideGeo = new THREE.RingGeometry(0.8, 1.8, 16, 1, 0, Math.PI / 2);
-    const aimGuideMat = new THREE.MeshBasicMaterial({ color: 0xff4d4d, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
-    const aimGuide = new THREE.Mesh(aimGuideGeo, aimGuideMat);
+    // 4번째 사진과 같은 반투명 사각형/부채꼴 공격 방향 조준선
+    const aimBoxGeo = new THREE.PlaneGeometry(1.6, 2.8);
+    const aimBoxMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.42,
+      side: THREE.DoubleSide
+    });
+    const aimGuide = new THREE.Mesh(aimBoxGeo, aimBoxMat);
     aimGuide.rotation.x = -Math.PI / 2;
-    aimGuide.position.y = 0.05;
+    aimGuide.position.set(0, 0.08, 1.75); // 캐릭터 전방(+Z)으로 뻗어나가는 조준선
     aimGuide.visible = false;
     playerGroup.add(aimGuide);
+
+    // 발밑 파란색 원형 링 (4번째 사진 느낌)
+    const baseRing = new THREE.Mesh(
+      new THREE.RingGeometry(0.65, 0.85, 24),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide })
+    );
+    baseRing.rotation.x = -Math.PI / 2;
+    baseRing.position.y = 0.04;
+    playerGroup.add(baseRing);
 
     const playerLabelEl = document.createElement('div');
     playerLabelEl.className = 'float-tag player-tag';
     document.getElementById('floating-labels').appendChild(playerLabelEl);
 
     function updatePlayerUI() {
+      const hpPct = Math.max(0, Math.min(100, (state.hp / state.maxHp) * 100));
       playerLabelEl.innerHTML = `
         <div class="player-name-badge">${state.nickname} <span>Lv.${state.level}</span></div>
-        <div class="player-hp-bar"><div class="player-hp-fill" id="my-hp-fill" style="width:${(state.hp/state.maxHp)*100}%"></div></div>
+        <div class="player-hp-bar">
+          <div class="player-hp-fill" style="width:${hpPct}%"></div>
+          <div class="player-hp-text">${state.hp}/${state.maxHp} HP</div>
+        </div>
       `;
-      document.getElementById('hud-lv').textContent = `Lv.${state.level}`;
+      document.getElementById('hud-lv').textContent = `Lv.${state.level} / ${state.maxLevel}`;
       const pct = Math.min(100, Math.round((state.exp / state.maxExp) * 100));
       document.getElementById('hud-exp-bar').style.width = `${pct}%`;
-      document.getElementById('hud-slime-count').textContent = `처치 퀘스트: ${state.questProgress}/5`;
+      document.getElementById('hud-slime-count').textContent = `처치: ${state.questProgress}/5`;
     }
 
-    // 캐릭터 커스텀
-    const CHAR_STYLES = {
-      knight: { body: 0x3b82f6, hat: 0x94a3b8 },
-      mage:   { body: 0x6366f1, hat: 0x312e81 },
-      ranger: { body: 0x16a34a, hat: 0x14532d },
-      dark:   { body: 0xdc2626, hat: 0x1f2937 }
-    };
-    document.querySelectorAll('.char-option').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.char-option').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const style = CHAR_STYLES[btn.dataset.style];
-        bodyMat.color.setHex(style.body);
-        hatMat.color.setHex(style.hat);
-        showToast('✨ 캐릭터 외형이 변경되었습니다!');
-      });
-    });
-
     // ==========================================
-    // 7. 슬라임 소환 (점프하며 이동, 플레이어 공격)
+    // 7. 슬라임 소환 (내 캐릭터 절반 높이 점프 + 효과음 + 체력 표시)
     // ==========================================
     const slimes = [];
     const MAX_SLIMES = 10;
@@ -1049,12 +1229,11 @@
       if (slimes.length >= MAX_SLIMES) return;
 
       const sGroup = new THREE.Group();
-      // 3배 왼쪽으로 간 사냥터 구역 (X: -65 ~ -105, Z: -18 ~ 22)
-      const sx = -65 - Math.random() * 40;
-      const sz = -18 + Math.random() * 40;
+      const sx = -66 - Math.random() * 42;
+      const sz = -20 + Math.random() * 40;
       sGroup.position.set(sx, 0, sz);
 
-      const slimeMat = new THREE.MeshLambertMaterial({ color: 0x22c55e, transparent: true, opacity: 0.9 });
+      const slimeMat = new THREE.MeshLambertMaterial({ color: 0x22c55e, transparent: true, opacity: 0.92 });
       const slimeMesh = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 12), slimeMat);
       slimeMesh.scale.set(1.15, 0.82, 1.15);
       slimeMesh.position.y = 0.58; slimeMesh.castShadow = true;
@@ -1072,7 +1251,7 @@
       const tag = document.createElement('div');
       tag.className = 'float-tag slime-tag';
       tag.innerHTML = `
-        <div class="slime-hp-text">슬라임 HP 5/5</div>
+        <div class="slime-hp-text">슬라임 5/5 HP</div>
         <div class="slime-hp-bar"><div class="slime-hp-fill" style="width:100%"></div></div>
       `;
       document.getElementById('floating-labels').appendChild(tag);
@@ -1083,20 +1262,21 @@
         hp: 5,
         maxHp: 5,
         labelEl: tag,
-        hopOffset: Math.random() * Math.PI * 2,
+        hopPhase: Math.random() * Math.PI * 2,
         moveAngle: Math.random() * Math.PI * 2,
         aiTimer: 1 + Math.random() * 2,
-        attackCooldown: 0
+        attackCooldown: 0,
+        lastHopSoundPhase: 0
       });
     }
 
-    for (let i = 0; i < 4; i++) spawnSlime();
+    for (let i = 0; i < 5; i++) spawnSlime();
     setInterval(() => {
       if (state.started) spawnSlime();
     }, 8000);
 
     // ==========================================
-    // 8. 조이스틱 및 브롤스타즈 스타일 공격
+    // 8. 조이스틱 (왼쪽 이동 / 오른쪽 전방향 공격 조준) & 카메라 드래그
     // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
@@ -1109,7 +1289,7 @@
       const cy = rect.top + rect.height / 2;
       let dx = clientX - cx;
       let dy = clientY - cy;
-      const maxR = 38;
+      const maxR = 40;
       const dist = Math.hypot(dx, dy);
       if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
       moveStick.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -1118,6 +1298,7 @@
     }
 
     moveZone.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
       initAudio();
       moveTouchId = e.pointerId;
       moveZone.setPointerCapture(e.pointerId);
@@ -1136,32 +1317,34 @@
     moveZone.addEventListener('pointerup', resetMoveStick);
     moveZone.addEventListener('pointercancel', resetMoveStick);
 
-    // 우측 공격 조이스틱 (조준 및 발사)
+    // 우측 공격 조이스틱 (왼쪽/오른쪽/위/아래 어느 방향으로든 드래그하여 조준 후 발사)
     const atkZone = document.getElementById('attack-joystick-zone');
     const atkStick = document.getElementById('attack-stick');
     let atkTouchId = null;
+    let aimDirX = 0;
+    let aimDirZ = 1;
 
     function triggerAttack(dirX, dirZ) {
       if (!state.started || state.isAttacking) return;
       initAudio();
       state.isAttacking = true;
-      state.attackTimer = 0.26;
+      state.attackTimer = 0.25;
       playStickSwingSound();
 
       const angle = Math.atan2(dirX, dirZ);
       playerGroup.rotation.y = angle;
 
       const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-      const hitCenter = playerGroup.position.clone().addScaledVector(forward, 1.4);
+      const hitCenter = playerGroup.position.clone().addScaledVector(forward, 1.65);
 
       for (let i = slimes.length - 1; i >= 0; i--) {
         const s = slimes[i];
-        if (hitCenter.distanceTo(s.group.position) <= 2.3) {
+        if (hitCenter.distanceTo(s.group.position) <= 2.35) {
           s.hp -= state.damage;
           playSlimeHitSound();
           spawnDamagePopup(s.group.position, `-${state.damage}`);
 
-          s.group.position.addScaledVector(forward, 0.7);
+          s.group.position.addScaledVector(forward, 0.75);
           s.mesh.material.color.setHex(0xef4444);
           setTimeout(() => { if (s.mesh) s.mesh.material.color.setHex(0x22c55e); }, 140);
 
@@ -1170,24 +1353,31 @@
             s.labelEl.remove();
             slimes.splice(i, 1);
 
+            // 70% 확률로 1 코인 획득
+            if (Math.random() < 0.70) {
+              state.coins += 1;
+              updateCoinUI();
+              showToast('💲 슬라임 처치! +1 코인 획득!');
+            }
+
             if (!state.questCompleted) {
               state.questProgress++;
               if (state.questProgress >= 5) {
                 state.questCompleted = true;
-                showToast('🎉 슬라임 5마리 처치 퀘스트 완료! 가이드 할아버지에게 가보세요!');
+                showToast('🎉 슬라임 5마리 처치 완료! 오른쪽 가이드 NPC에게 가보세요!');
               }
             }
 
             state.exp += 5;
-            if (state.exp >= state.maxExp) {
+            if (state.exp >= state.maxExp && state.level < state.maxLevel) {
               state.exp -= state.maxExp;
               state.level += 1;
-              state.maxExp = Math.round(state.maxExp * 1.4);
+              state.maxExp = Math.round(state.maxExp * 1.35);
               showToast(`🎉 레벨 업! Lv.${state.level} 달성!`);
             }
             updatePlayerUI();
           } else {
-            s.labelEl.querySelector('.slime-hp-text').textContent = `슬라임 HP ${s.hp}/${s.maxHp}`;
+            s.labelEl.querySelector('.slime-hp-text').textContent = `슬라임 ${s.hp}/${s.maxHp} HP`;
             s.labelEl.querySelector('.slime-hp-fill').style.width = `${(s.hp / s.maxHp) * 100}%`;
           }
         }
@@ -1195,45 +1385,104 @@
     }
 
     atkZone.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      initAudio();
       atkTouchId = e.pointerId;
       atkZone.setPointerCapture(e.pointerId);
-      atkStick.style.transform = 'scale(0.92)';
       aimGuide.visible = true;
+
+      // 현재 캐릭터가 바라보는 방향을 초기 조준 방향으로 설정
+      aimDirX = Math.sin(playerGroup.rotation.y);
+      aimDirZ = Math.cos(playerGroup.rotation.y);
     });
+
     atkZone.addEventListener('pointermove', (e) => {
       if (e.pointerId !== atkTouchId) return;
       const rect = atkZone.getBoundingClientRect();
       const dx = e.clientX - (rect.left + rect.width / 2);
       const dy = e.clientY - (rect.top + rect.height / 2);
-      const maxR = 28;
+      const maxR = 38;
       const dist = Math.hypot(dx, dy);
       const clampX = dist > maxR ? (dx / dist) * maxR : dx;
       const clampY = dist > maxR ? (dy / dist) * maxR : dy;
-      atkStick.style.transform = `translate(${clampX}px, ${clampY}px) scale(0.95)`;
-      if (dist > 8) {
-        playerGroup.rotation.y = Math.atan2(dx, dy);
+      atkStick.style.transform = `translate(${clampX}px, ${clampY}px)`;
+
+      if (dist > 6) {
+        aimDirX = dx / dist;
+        aimDirZ = dy / dist;
+        playerGroup.rotation.y = Math.atan2(aimDirX, aimDirZ);
       }
     });
+
     const resetAtkStick = (e) => {
       if (e.pointerId === atkTouchId) {
         atkTouchId = null;
-        atkStick.style.transform = 'translate(0px, 0px) scale(1)';
+        atkStick.style.transform = 'translate(0px, 0px)';
         aimGuide.visible = false;
-        // 떼는 순간 발사
-        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
-        triggerAttack(forward.x, forward.z);
+        triggerAttack(aimDirX, aimDirZ);
       }
     };
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
+
+    // 화면 좌우 드래그로 카메라 시점 오프셋 이동 + NPC 터치 판정
+    let camPanOffsetX = 0;
+    let isDraggingScreen = false;
+    let dragStartX = 0;
+    let dragMoved = false;
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (!state.started) return;
+      isDraggingScreen = true;
+      dragStartX = e.clientX;
+      dragMoved = false;
+    });
+
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      if (!isDraggingScreen) return;
+      const dx = e.clientX - dragStartX;
+      if (Math.abs(dx) > 5) dragMoved = true;
+      camPanOffsetX -= dx * 0.045;
+      camPanOffsetX = Math.max(-22, Math.min(22, camPanOffsetX));
+      dragStartX = e.clientX;
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+      if (!isDraggingScreen) return;
+      isDraggingScreen = false;
+      if (!dragMoved && state.started) {
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(clickableNPCs.map(g => g.mesh));
+        if (hits.length > 0) {
+          const found = clickableNPCs.find(g => g.mesh === hits[0].object);
+          if (found) {
+            if (found.type === 'guard') {
+              showToast('🛡️ 경비원: "왕국을 지키는 경비원"');
+            } else if (found.type === 'guide') {
+              if (!state.questCompleted) {
+                showToast('가이드 NPC: "1레벨부터 5레벨까지 슬라임을 잡으세요! 잡을 때까지 처치하세요!"');
+              } else {
+                showToast('가이드 NPC: "좋아! 잘했어!"');
+              }
+            }
+          }
+        }
+      }
+    });
 
     // PC 키보드 지원
     const keys = {};
     window.addEventListener('keydown', (e) => {
       keys[e.code] = true;
       if (e.code === 'Space') {
-        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
-        triggerAttack(forward.x, forward.z);
+        const fx = Math.sin(playerGroup.rotation.y);
+        const fz = Math.cos(playerGroup.rotation.y);
+        triggerAttack(fx, fz);
       }
     });
     window.addEventListener('keyup', (e) => { keys[e.code] = false; });
@@ -1251,15 +1500,15 @@
 
     function closePanels() {
       document.getElementById('inventory-panel').style.display = 'none';
-      document.getElementById('char-panel').style.display = 'none';
+      document.getElementById('guide-panel').style.display = 'none';
     }
     document.getElementById('btn-inventory').addEventListener('click', () => {
       const p = document.getElementById('inventory-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
-    document.getElementById('btn-char').addEventListener('click', () => {
-      const p = document.getElementById('char-panel');
+    document.getElementById('btn-guide').addEventListener('click', () => {
+      const p = document.getElementById('guide-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
@@ -1269,50 +1518,47 @@
     // ==========================================
     let peer = null;
     let myPeerId = null;
-    const remotePlayers = {}; // 타인 플레이어 캐릭터 객체들
+    const remotePlayers = {};
+    const connections = {};
 
     function initMultiplayer() {
-      // 고유 채널명 생성 (모든 접속자가 같은 방 'slime_kingdom_room_v1' 공유)
-      const roomId = 'slime_kingdom_room_v1';
-      peer = new Peer(null, { debug: 1 });
-
+      const roomId = 'slime_kingdom_room_v2';
+      peer = new Peer(null, { debug: 0 });
       peer.on('open', (id) => {
         myPeerId = id;
-        connectToRoom(roomId);
-      });
-    }
-
-    const connections = {};
-    function connectToRoom(roomId) {
-      // 마스터/서버 접속 시도
-      const conn = peer.connect(roomId);
-      setupConnection(conn);
-
-      peer.on('connection', (incomingConn) => {
-        setupConnection(incomingConn);
+        const conn = peer.connect(roomId);
+        setupConnection(conn);
+        peer.on('connection', (incomingConn) => setupConnection(incomingConn));
       });
     }
 
     function setupConnection(conn) {
       conn.on('open', () => {
         connections[conn.peer] = conn;
-        // 내 정보 전송
         conn.send({
           type: 'join',
-          id: myPeerId,
           name: state.nickname,
           x: playerGroup.position.x,
           z: playerGroup.position.z,
           level: state.level
         });
       });
-
       conn.on('data', (data) => {
-        handleNetData(data, conn.peer);
+        if (data.type === 'join' || data.type === 'move') {
+          let rp = remotePlayers[conn.peer];
+          if (!rp) {
+            rp = createRemotePlayer(data.name || '용사');
+            remotePlayers[conn.peer] = rp;
+          }
+          rp.targetPos.set(data.x, 0, data.z);
+        }
       });
-
       conn.on('close', () => {
-        removeRemotePlayer(conn.peer);
+        if (remotePlayers[conn.peer]) {
+          scene.remove(remotePlayers[conn.peer].group);
+          remotePlayers[conn.peer].labelEl.remove();
+          delete remotePlayers[conn.peer];
+        }
       });
     }
 
@@ -1320,19 +1566,6 @@
       Object.values(connections).forEach(conn => {
         if (conn.open) conn.send(data);
       });
-    }
-
-    function handleNetData(data, peerId) {
-      if (data.type === 'join' || data.type === 'move') {
-        let rp = remotePlayers[peerId];
-        if (!rp) {
-          rp = createRemotePlayer(data.name || '용사');
-          remotePlayers[peerId] = rp;
-        }
-        rp.targetPos.set(data.x, 0, data.z);
-        rp.name = data.name;
-        rp.level = data.level;
-      }
     }
 
     function createRemotePlayer(name) {
@@ -1351,16 +1584,8 @@
       return { group: g, targetPos: new THREE.Vector3(), labelEl: tag };
     }
 
-    function removeRemotePlayer(peerId) {
-      if (remotePlayers[peerId]) {
-        scene.remove(remotePlayers[peerId].group);
-        remotePlayers[peerId].labelEl.remove();
-        delete remotePlayers[peerId];
-      }
-    }
-
     // ==========================================
-    // 10. 메인 루프 (렌더링 & AI & 충돌)
+    // 10. 메인 루프 (탑다운 카메라 & 슬라임 점프 & 경계 체크)
     // ==========================================
     function updateScreenLabel(worldPos, offsetY, el) {
       const v = worldPos.clone(); v.y += offsetY; v.project(camera);
@@ -1372,6 +1597,7 @@
     }
 
     const clock = new THREE.Clock();
+    const wipBanner = document.getElementById('wip-banner');
     let netSyncTimer = 0;
 
     function animate() {
@@ -1391,21 +1617,30 @@
         if (len > 0.05) {
           vx /= Math.max(1, len);
           vz /= Math.max(1, len);
-          const speed = 7.5;
+          const speed = 7.8;
           playerGroup.position.x += vx * speed * dt;
           playerGroup.position.z += vz * speed * dt;
 
-          playerGroup.position.x = Math.max(-110, Math.min(45, playerGroup.position.x));
-          playerGroup.position.z = Math.max(-28, Math.min(28, playerGroup.position.z));
-          if (playerGroup.position.x > -7 && playerGroup.position.x < 7 && playerGroup.position.z < -3.2) {
+          // 이동 시 카메라 좌우 오프셋 자연스럽게 복귀
+          camPanOffsetX *= 0.92;
+
+          // 맵 경계 제한
+          playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
+          playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
+
+          // 왕국 성벽 충돌 방지
+          if (playerGroup.position.x > -14 && playerGroup.position.x < 14 && playerGroup.position.z < -3.2) {
             playerGroup.position.z = -3.2;
           }
 
-          playerGroup.rotation.y = Math.atan2(vx, vz);
+          // 공격 조준 중이 아닐 때만 이동 방향으로 회전
+          if (atkTouchId === null) {
+            playerGroup.rotation.y = Math.atan2(vx, vz);
+          }
+
           playerGroup.position.y = Math.abs(Math.sin(elapsed * 14)) * 0.14;
           playGrassStepSound();
 
-          // 멀티플레이어 위치 동기화 브로드캐스트
           netSyncTimer += dt;
           if (netSyncTimer > 0.1) {
             netSyncTimer = 0;
@@ -1421,9 +1656,19 @@
           playerGroup.position.y = 0;
         }
 
+        // 맵 끝 도달 시 상단 "제작중..." 문구 표시
+        const atEdge = (
+          playerGroup.position.x <= MAP_MIN_X + 1.5 ||
+          playerGroup.position.x >= MAP_MAX_X - 1.5 ||
+          playerGroup.position.z <= MAP_MIN_Z + 1.5 ||
+          playerGroup.position.z >= MAP_MAX_Z - 1.5
+        );
+        wipBanner.style.display = atEdge ? 'block' : 'none';
+
+        // 나무 막대기 공격 애니메이션
         if (state.isAttacking) {
           state.attackTimer -= dt;
-          const progress = 1 - (state.attackTimer / 0.26);
+          const progress = 1 - (state.attackTimer / 0.25);
           weaponPivot.rotation.x = Math.sin(progress * Math.PI) * 1.45;
           weaponPivot.rotation.y = Math.sin(progress * Math.PI) * 0.9;
           if (state.attackTimer <= 0) {
@@ -1433,57 +1678,75 @@
         }
       }
 
-      // 슬라임 점프 및 플레이어 충돌 데미지 (3 데미지)
+      // 슬라임 점프 이동 (내 캐릭터 키 2.2의 절반 = 약 1.1 높이 점프) + 효과음
       slimes.forEach(s => {
         s.aiTimer -= dt;
         if (s.aiTimer <= 0) {
           s.moveAngle = Math.random() * Math.PI * 2;
-          s.aiTimer = 1.5 + Math.random() * 2.5;
+          s.aiTimer = 1.6 + Math.random() * 2.2;
         }
-        s.group.position.x += Math.cos(s.moveAngle) * 1.2 * dt;
-        s.group.position.z += Math.sin(s.moveAngle) * 1.2 * dt;
-        s.group.position.x = Math.max(-105, Math.min(-65, s.group.position.x));
-        s.group.position.z = Math.max(-18, Math.min(18, s.group.position.z));
 
-        const hop = Math.abs(Math.sin(elapsed * 5.0 + s.hopOffset));
-        s.mesh.position.y = 0.58 + hop * 0.4;
-        s.mesh.scale.set(1.15 - hop * 0.12, 0.82 + hop * 0.24, 1.15 - hop * 0.12);
+        // 점프 주기 계산
+        const cycle = (elapsed * 3.8 + s.hopPhase) % Math.PI;
+        const jumpHeight = Math.sin(cycle) * 1.15; // 내 캐릭터 키의 절반 높이 점프!
 
-        // 플레이어와 충돌 체크 (슬라임이 닿으면 3 데미지)
+        // 공중에 떠 있을 때만 앞으로 이동 (진짜 점프하면서 이동하는 느낌)
+        if (jumpHeight > 0.08) {
+          s.group.position.x += Math.cos(s.moveAngle) * 2.2 * dt;
+          s.group.position.z += Math.sin(s.moveAngle) * 2.2 * dt;
+        }
+
+        // 점프 시작 시 효과음 (플레이어와 가까울 때만 들리도록 거리 체크)
+        if (cycle < 0.25 && s.lastHopSoundPhase > 2.5) {
+          if (s.group.position.distanceTo(playerGroup.position) < 18) {
+            playSlimeBounceSound();
+          }
+        }
+        s.lastHopSoundPhase = cycle;
+
+        s.group.position.x = Math.max(-110, Math.min(-65, s.group.position.x));
+        s.group.position.z = Math.max(-22, Math.min(22, s.group.position.z));
+
+        s.mesh.position.y = 0.58 + jumpHeight;
+        const stretch = jumpHeight * 0.22;
+        s.mesh.scale.set(1.15 - stretch * 0.5, 0.82 + stretch, 1.15 - stretch * 0.5);
+
+        // 슬라임이 부딪히면 3 데미지
         s.attackCooldown -= dt;
-        if (state.started && s.group.position.distanceTo(playerGroup.position) < 1.2 && s.attackCooldown <= 0) {
-          s.attackCooldown = 1.5;
+        if (state.started && s.group.position.distanceTo(playerGroup.position) < 1.25 && s.attackCooldown <= 0) {
+          s.attackCooldown = 1.4;
           state.hp = Math.max(0, state.hp - 3);
           playSlimeHitSound();
           spawnDamagePopup(playerGroup.position, `-3 HP`);
-          document.getElementById('my-hp-fill').style.width = `${(state.hp/state.maxHp)*100}%`;
+          updatePlayerUI();
+
           if (state.hp <= 0) {
-            showToast('💀 체력이 다 닳았습니다! 왕국 부활 포인트로 리스폰됩니다.');
+            showToast('💀 체력이 0이 되었습니다! 왕국 앞에서 부활합니다.');
             state.hp = state.maxHp;
-            playerGroup.position.set(0, 0, 8);
+            playerGroup.position.set(0, 0, 9);
+            updatePlayerUI();
           }
         }
 
-        updateScreenLabel(s.group.position, 1.45, s.labelEl);
+        updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
       });
 
-      // 타인 플레이어 부드러운 보간 이동
       Object.values(remotePlayers).forEach(rp => {
         rp.group.position.lerp(rp.targetPos, 0.15);
-        updateScreenLabel(rp.group.position, 2.65, rp.labelEl);
+        updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
       });
 
-      // 브롤스타즈 쿼터뷰 카메라 추적
-      const targetCamX = playerGroup.position.x;
-      const targetCamY = playerGroup.position.y + 14.0;
-      const targetCamZ = playerGroup.position.z + 14.0;
-      camera.position.x += (targetCamX - camera.position.x) * 0.1;
-      camera.position.y += (targetCamY - camera.position.y) * 0.1;
-      camera.position.z += (targetCamZ - camera.position.z) * 0.1;
-      camera.lookAt(playerGroup.position.x, playerGroup.position.y + 1.0, playerGroup.position.z);
+      // 4번째 사진과 동일한 브롤스타즈 탑다운 시점 + 좌우 카메라 오프셋 지원
+      const targetCamX = playerGroup.position.x + camPanOffsetX;
+      const targetCamY = 18.5;
+      const targetCamZ = playerGroup.position.z + 11.5;
+      camera.position.x += (targetCamX - camera.position.x) * 0.12;
+      camera.position.y += (targetCamY - camera.position.y) * 0.12;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.12;
+      camera.lookAt(playerGroup.position.x + camPanOffsetX, 0.5, playerGroup.position.z - 0.5);
 
       if (state.started) {
-        updateScreenLabel(playerGroup.position, 2.65, playerLabelEl);
+        updateScreenLabel(playerGroup.position, 2.75, playerLabelEl);
       }
       labelsData.forEach(g => updateScreenLabel(g.obj.position, g.offset, g.el));
 
