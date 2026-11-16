@@ -571,11 +571,13 @@
 
   <div id="hud" style="display:none;">
     <div class="top-bar">
+      <!-- 왼쪽 위: 인벤토리 & 캐릭터 강화 -->
       <div class="top-left-group">
         <button class="hud-btn" id="btn-inventory">🎒 인벤토리</button>
         <button class="hud-btn" id="btn-upgrade" style="background:rgba(217, 119, 6, 0.9);">💪 캐릭터 강화</button>
       </div>
 
+      <!-- 중앙: 레벨 및 퀘스트 -->
       <div class="center-status">
         <div class="exp-box">
           <span id="hud-lv">Lv.1 / 50</span>
@@ -584,6 +586,7 @@
         </div>
       </div>
 
+      <!-- 오른쪽 위: 시점 변경, 전체화면, 게임 가이드 -->
       <div class="top-right-group">
         <button class="hud-btn" id="btn-cam-mode">🎥 시점: 탑다운</button>
         <button class="hud-btn" id="btn-fullscreen">⛶ 전체화면</button>
@@ -591,6 +594,7 @@
       </div>
     </div>
 
+    <!-- 인벤토리 창 -->
     <div class="modal-panel" id="inventory-panel">
       <div class="panel-header">
         <span>🎒 내 인벤토리</span>
@@ -609,6 +613,7 @@
       </div>
     </div>
 
+    <!-- 캐릭터 강화 패널 (인벤토리 밑) -->
     <div class="modal-panel" id="upgrade-panel">
       <div class="panel-header">
         <span>💪 캐릭터 강화소</span>
@@ -630,6 +635,7 @@
       </div>
     </div>
 
+    <!-- 게임 가이드 창 -->
     <div class="modal-panel" id="guide-panel">
       <div class="panel-header">
         <span>📖 게임 가이드</span>
@@ -644,12 +650,14 @@
       </ul>
     </div>
 
+    <!-- 좌측 아래 이동 조이스틱 -->
     <div id="move-joystick-zone">
       <div class="joystick-base" id="move-base">
         <div id="move-stick"></div>
       </div>
     </div>
 
+    <!-- 우측 아래 공격 조이스틱 -->
     <div id="attack-joystick-zone">
       <div id="attack-stick-base">
         <div id="attack-stick">⚔️<span style="font-size:10px;">공격</span></div>
@@ -684,7 +692,7 @@
 
     document.getElementById('btn-fullscreen').addEventListener('click', () => {
       requestFullScreenMode();
-      showToast('🖥️ 전체화면 모드 활성화');
+      showToast('🖥️ 전체화면 모드 활성화 (화면 회전 고정)');
     });
 
     // 사운드
@@ -784,6 +792,7 @@
       osc.start(t); osc.stop(t + 0.19);
     }
 
+    // 상태 관리 (시작 체력 30 설정 반영)
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
     const COINS_KEY = 'kingdom_3d_player_coins';
@@ -799,8 +808,11 @@
 
     function saveStats() {
       localStorage.setItem(STATS_KEY, JSON.stringify({
-        hp: state.hp, maxHp: state.maxHp, dmg: state.damage,
-        spdMultiplier: state.speedMultiplier, spdLevel: state.speedLevel
+        hp: state.hp,
+        maxHp: state.maxHp,
+        dmg: state.damage,
+        spdMultiplier: state.speedMultiplier,
+        spdLevel: state.speedLevel
       }));
     }
 
@@ -808,14 +820,23 @@
     const state = {
       started: false,
       nickname: localStorage.getItem(STORAGE_KEY) || '',
-      level: 1, maxLevel: 50, exp: 0, maxExp: 15,
-      damage: savedStats.dmg, hp: savedStats.hp, maxHp: savedStats.maxHp,
+      level: 1,
+      maxLevel: 50,
+      exp: 0,
+      maxExp: 15,
+      damage: savedStats.dmg,
+      hp: savedStats.hp,
+      maxHp: savedStats.maxHp,
       coins: parseInt(localStorage.getItem(COINS_KEY) || '0', 10),
-      speedMultiplier: savedStats.spdMultiplier, speedLevel: savedStats.spdLevel,
-      isAttacking: false, attackTimer: 0,
-      questProgress: 0, questCompleted: false,
-      camMode: 'topdown',
-      lastDamageTime: 0, lastRegenTick: 0
+      speedMultiplier: savedStats.spdMultiplier,
+      speedLevel: savedStats.spdLevel,
+      isAttacking: false,
+      attackTimer: 0,
+      questProgress: 0,
+      questCompleted: false,
+      camMode: 'topdown', // 'topdown' 또는 'firstperson'
+      lastDamageTime: 0,
+      lastRegenTick: 0
     };
 
     const toastEl = document.getElementById('toast-msg');
@@ -882,7 +903,9 @@
       setTimeout(resizeRenderer, 150);
     });
 
-    // Three.js 3D 월드 설정
+    // ==========================================
+    // 3. Three.js 3D 월드 (왕국 진입 불가 벽 포함)
+    // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
@@ -957,7 +980,9 @@
       scene.add(tuft);
     }
 
-    // 왕국
+    // ==========================================
+    // 4. 더욱 디테일해진 왕국 (진입 불가 벽)
+    // ==========================================
     const kingdomGroup = new THREE.Group();
     kingdomGroup.position.set(0, 0, -14);
     kingdomGroup.scale.set(3.0, 3.0, 3.0);
@@ -1001,7 +1026,9 @@
 
     scene.add(kingdomGroup);
 
-    // NPC
+    // ==========================================
+    // 5. NPC 및 표지판
+    // ==========================================
     const clickableNPCs = [];
     const labelsData = [];
 
@@ -1077,7 +1104,9 @@
     createSign(18.5, -0.25, '📖 가이드', 'NPC에게 말을 걸어보세요');
     createSign(-24, 0.25, '⬅️ 1~10렙 사냥터', '(슬라임 처치 퀘스트)');
 
-    // 플레이어
+    // ==========================================
+    // 6. 내 캐릭터 & 조준선
+    // ==========================================
     const playerGroup = new THREE.Group();
     playerGroup.position.set(0, 0, 9);
     scene.add(playerGroup);
@@ -1137,7 +1166,9 @@
       document.getElementById('hud-slime-count').textContent = `처치: ${state.questProgress}/5`;
     }
 
-    // 슬라임
+    // ==========================================
+    // 7. 슬라임 소환
+    // ==========================================
     const slimes = [];
     const MAX_SLIMES = 10;
 
@@ -1169,7 +1200,9 @@
     for (let i = 0; i < 5; i++) spawnSlime();
     setInterval(() => { if (state.started) spawnSlime(); }, 8000);
 
-    // 조이스틱
+    // ==========================================
+    // 8. 조이스틱 및 강화 시스템
+    // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
     const moveStick = document.getElementById('move-stick');
@@ -1290,29 +1323,43 @@
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
 
-    // 강화 버튼
+    // 캐릭터 강화 버튼 이벤트 (5코인 소모)
     document.getElementById('up-hp-btn').addEventListener('click', () => {
       if (state.coins >= 5) {
-        state.coins -= 5; state.maxHp += 5; state.hp += 5;
+        state.coins -= 5;
+        state.maxHp += 5;
+        state.hp += 5;
         updateCoinUI(); updatePlayerUI(); saveStats();
         showToast('❤️ 최대 체력 강화 완료! (+5 HP)');
-      } else { showToast('❌ 코인이 부족합니다!'); }
-    });
-    document.getElementById('up-dmg-btn').addEventListener('click', () => {
-      if (state.coins >= 5) {
-        state.coins -= 5; state.damage += 2;
-        updateCoinUI(); saveStats();
-        showToast('⚔️ 공격력 강화 완료! (+2 데미지)');
-      } else { showToast('❌ 코인이 부족합니다!'); }
-    });
-    document.getElementById('up-spd-btn').addEventListener('click', () => {
-      if (state.coins >= 5) {
-        state.coins -= 5; state.speedMultiplier *= 1.15; state.speedLevel += 1;
-        updateCoinUI(); saveStats();
-        showToast('⚡ 스피드 강화 완료!');
-      } else { showToast('❌ 코인이 부족합니다!'); }
+      } else {
+        showToast('❌ 코인이 부족합니다! (필요: 5 코인)');
+      }
     });
 
+    document.getElementById('up-dmg-btn').addEventListener('click', () => {
+      if (state.coins >= 5) {
+        state.coins -= 5;
+        state.damage += 2;
+        updateCoinUI(); saveStats();
+        showToast('⚔️ 공격력 강화 완료! (+2 데미지)');
+      } else {
+        showToast('❌ 코인이 부족합니다! (필요: 5 코인)');
+      }
+    });
+
+    document.getElementById('up-spd-btn').addEventListener('click', () => {
+      if (state.coins >= 5) {
+        state.coins -= 5;
+        state.speedMultiplier *= 1.15;
+        state.speedLevel += 1;
+        updateCoinUI(); saveStats();
+        showToast('⚡ 스피드 강화 완료! (1.15배)');
+      } else {
+        showToast('❌ 코인이 부족합니다! (필요: 5 코인)');
+      }
+    });
+
+    // 시점 변경 및 패널 토글
     document.getElementById('btn-cam-mode').addEventListener('click', () => {
       if (state.camMode === 'topdown') {
         state.camMode = 'firstperson';
@@ -1336,11 +1383,13 @@
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
+
     document.getElementById('btn-upgrade').addEventListener('click', () => {
       const p = document.getElementById('upgrade-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
+
     document.getElementById('btn-guide').addEventListener('click', () => {
       const p = document.getElementById('guide-panel');
       const isOpen = p.style.display === 'block';
@@ -1490,6 +1539,7 @@
             playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
             playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
 
+            // 왕국 진입 방지 벽 충돌 체크
             if (playerGroup.position.x > -15 && playerGroup.position.x < 15 && playerGroup.position.z < -2.0) {
               playerGroup.position.z = -2.0;
             }
@@ -1515,6 +1565,7 @@
           );
           wipBanner.style.display = atEdge ? 'block' : 'none';
 
+          // 맞은 후 1초 지나면 0.2초마다 체력 2씩 회복 (➕️ 초록색)
           if (state.hp < state.maxHp && (elapsed - state.lastDamageTime) > 1.0) {
             if ((elapsed - state.lastRegenTick) > 0.2) {
               state.lastRegenTick = elapsed;
@@ -1572,8 +1623,10 @@
           updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
         });
 
+        // 카메라 시점 처리 (탑다운 vs 1인칭)
         let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
         if (state.camMode === 'firstperson') {
+          // 1인칭 화면 (캐릭터 등 뒤 가깝게)
           const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
           targetCamX = playerGroup.position.x - forward.x * 2.2;
           targetCamY = playerGroup.position.y + 1.8;
@@ -1582,6 +1635,7 @@
           lookY = playerGroup.position.y + 1.2;
           lookZ = playerGroup.position.z + forward.z * 4;
         } else {
+          // 탑다운 뷰 (전체화면 시 화면 못 움직이게 고정)
           targetCamX = playerGroup.position.x;
           targetCamY = 18.5;
           targetCamZ = playerGroup.position.z + 11.5;
