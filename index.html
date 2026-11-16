@@ -224,7 +224,6 @@
       pointer-events: none;
     }
 
-    /* 장착한 지도 동그라미 아이콘 */
     #equipped-map-badge {
       position: fixed;
       left: 16px;
@@ -249,7 +248,6 @@
       50% { transform: scale(1.08); }
     }
 
-    /* 화면 정중앙 네모난 미니맵 팝업 창 */
     #map-modal {
       display: none;
       position: fixed;
@@ -289,15 +287,6 @@
       position: relative;
       background: #2e7d32;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .minimap-canvas-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      background: linear-gradient(135deg, #2e7d32, #1b5e20);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -740,7 +729,7 @@
   <!-- 장착한 지도 아이콘 -->
   <div id="equipped-map-badge" title="장착된 지도 (클릭 시 미니맵 팝업)">🗺️</div>
 
-  <!-- 화면 정중앙 네모난 미니맵 팝업 창 -->
+  <!-- 미니맵 팝업 창 -->
   <div id="map-modal">
     <div class="map-popup-box">
       <div class="map-popup-header">
@@ -848,9 +837,9 @@
         <button class="close-btn" onclick="closePanels()">✕</button>
       </div>
       <ul class="guide-list">
-        <li>1. 화면 드래그로 시점(하늘 위까지) 자유 회전</li>
-        <li>2. 두 손가락 핀치 줌으로 화면 확대/축소 가능</li>
-        <li>3. 왼쪽 조이스틱 이동 / 오른쪽 조이스틱 공격</li>
+        <li>1. 나무 막대기 장착 해제 시 공격 불가</li>
+        <li>2. 화면 드래그로 시점(하늘 위까지) 자유 회전</li>
+        <li>3. 두 손가락 핀치 줌으로 화면 확대/축소 가능</li>
         <li>4. 가이드 NPC에게 말을 걸어 퀘스트 클리어</li>
       </ul>
     </div>
@@ -868,7 +857,7 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
     let renderer, camera;
 
@@ -897,7 +886,7 @@
     });
 
     // ==========================================
-    // 효과음 시스템 (Web Audio API)
+    // 효과음 시스템
     // ==========================================
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
@@ -1001,13 +990,13 @@
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
     const COINS_KEY = 'kingdom_3d_player_coins';
-    const STATS_KEY = 'kingdom_3d_player_stats_v4';
+    const STATS_KEY = 'kingdom_3d_player_stats_v5';
 
     function getSavedStats() {
       try {
-        return JSON.parse(localStorage.getItem(STATS_KEY)) || { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: [] };
+        return JSON.parse(localStorage.getItem(STATS_KEY)) || { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: ['stick'] };
       } catch {
-        return { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: [] };
+        return { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: ['stick'] };
       }
     }
 
@@ -1031,13 +1020,13 @@
       coins: parseInt(localStorage.getItem(COINS_KEY) || '0', 10),
       speedMultiplier: savedStats.spdMultiplier,
       speedLevel: savedStats.spdLevel,
-      equipped: savedStats.equipped || [],
+      equipped: savedStats.equipped || ['stick'],
       isAttacking: false,
       attackTimer: 0,
       questStage: 0,
       questProgress: 0,
       camMode: 'topdown',
-      zoomDistance: 1.0, // 핀치 줌 배율
+      zoomDistance: 1.0,
       lastDamageTime: -10,
       lastRegenTick: 0
     };
@@ -1070,8 +1059,10 @@
 
       if (state.equipped.includes('stick')) {
         stickBtn.textContent = '장착해제'; stickBtn.classList.add('equipped');
+        if (window.stickMeshObj) window.stickMeshObj.visible = true;
       } else {
         stickBtn.textContent = '장착'; stickBtn.classList.remove('equipped');
+        if (window.stickMeshObj) window.stickMeshObj.visible = false;
       }
 
       if (state.equipped.includes('map')) {
@@ -1148,7 +1139,7 @@
     });
 
     // ==========================================
-    // Three.js 3D 월드 (왕국 & 사냥터 완벽 구성)
+    // Three.js 3D 월드 (안전한 안전 구조)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
@@ -1271,7 +1262,7 @@
     scene.add(kingdomGroup);
 
     // ==========================================
-    // NPC 및 표지판 (이름표 가시거리 최적화 적용)
+    // NPC 및 표지판
     // ==========================================
     const clickableNPCs = [];
     const labelsData = [];
@@ -1295,7 +1286,7 @@
       tag.textContent = '🛡️ 경비원';
       tag.addEventListener('click', () => { playSound('click'); showToast('🛡️ 경비원: "왕국을 지키는 든든한 경비원입니다."'); });
       document.getElementById('floating-labels').appendChild(tag);
-      labelsData.push({ obj: g, el: tag, offset: 2.75, maxDist: 18 }); // 18m 이내에서만 표시
+      labelsData.push({ obj: g, el: tag, offset: 2.75, maxDist: 18 });
     }
 
     createGuard(-7.5, -2.0);
@@ -1319,7 +1310,7 @@
     guideTag.textContent = '가이드 NPC';
     guideTag.addEventListener('click', () => interactWithGuideNPC());
     document.getElementById('floating-labels').appendChild(guideTag);
-    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55, maxDist: 22 }); // 22m 이내에서만 표시
+    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55, maxDist: 22 });
 
     function createSign(x, rotY, title, sub) {
       const signGroup = new THREE.Group();
@@ -1377,6 +1368,7 @@
     const stickMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.45, 8), new THREE.MeshLambertMaterial({ color: 0x8b5a2b }));
     stickMesh.position.set(0, 0.45, 0.35); stickMesh.rotation.x = Math.PI / 3; stickMesh.castShadow = true;
     weaponPivot.add(stickMesh);
+    window.stickMeshObj = stickMesh;
 
     const aimBoxGeo = new THREE.PlaneGeometry(1.6, 2.8);
     const aimBoxMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.42, side: THREE.DoubleSide });
@@ -1532,7 +1524,7 @@
     }
 
     // ==========================================
-    // 조이스틱 및 이동 방향 오류 수정 완료
+    // 조이스틱
     // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
@@ -1575,6 +1567,13 @@
 
     function triggerAttack(dirX, dirZ) {
       if (!state.started || state.isAttacking) return;
+      
+      // 나무 막대기를 장착 해제했다면 공격 불가 제한
+      if (!state.equipped.includes('stick')) {
+        showToast('❌ 나무 막대기를 장착해야 공격할 수 있습니다!');
+        return;
+      }
+
       initAudio();
       state.isAttacking = true; state.attackTimer = 0.25;
       playSound('swing');
@@ -1654,14 +1653,11 @@
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
 
-    // ==========================================
-    // 카메라 자유 회전 (하늘 위까지 보기 가능) & 핀치 줌 (확대/축소)
-    // ==========================================
+    // 카메라 회전 & 핀치 줌
     let isDraggingScreen = false;
     let prevMouseX = 0; let prevMouseY = 0;
     let cameraAngleY = 0;
-    let cameraAngleX = 0.45; // 하늘 위까지 볼 수 있도록 범위 확장 (-0.8 ~ 1.5)
-
+    let cameraAngleX = 0.45;
     let initialPinchDist = null;
 
     renderer.domElement.addEventListener('pointerdown', (e) => {
@@ -1678,13 +1674,12 @@
       const dy = e.clientY - prevMouseY;
       cameraAngleY -= dx * 0.005;
       cameraAngleX += dy * 0.005;
-      cameraAngleX = Math.max(-0.8, Math.min(1.5, cameraAngleX)); // 하늘 위까지 완전히 볼 수 있도록 한계 해제
+      cameraAngleX = Math.max(-0.8, Math.min(1.5, cameraAngleX));
       prevMouseX = e.clientX; prevMouseY = e.clientY;
     });
 
     window.addEventListener('pointerup', () => { isDraggingScreen = false; initialPinchDist = null; });
 
-    // 두 손가락 핀치 줌 이벤트
     window.addEventListener('touchmove', (e) => {
       if (e.touches.length === 2) {
         const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
@@ -1692,7 +1687,7 @@
         else {
           const diff = dist - initialPinchDist;
           state.zoomDistance -= diff * 0.003;
-          state.zoomDistance = Math.max(0.5, Math.min(2.5, state.zoomDistance)); // 확대/축소 배율 제한
+          state.zoomDistance = Math.max(0.5, Math.min(2.5, state.zoomDistance));
           initialPinchDist = dist;
         }
       }
@@ -1715,7 +1710,6 @@
       }
     });
 
-    // 지도 동그라미 클릭 시 정중앙 네모 미니맵 팝업
     document.getElementById('equipped-map-badge').addEventListener('click', () => {
       playSound('map');
       document.getElementById('map-modal').style.display = 'flex';
@@ -1841,7 +1835,7 @@
       try {
         peer = new Peer(null, { debug: 0 });
         peer.on('open', () => {
-          const conn = peer.connect('slime_kingdom_room_v4');
+          const conn = peer.connect('slime_kingdom_room_v5');
           setupConnection(conn);
           peer.on('connection', (incomingConn) => setupConnection(incomingConn));
         });
@@ -1915,7 +1909,6 @@
       const elapsed = clock.getElapsedTime();
 
       if (state.started) {
-        // 조이스틱 방향 반전 오류 수정 (시점 회전각에 맞춰 정확하게 반영)
         let vx = moveInput.x; let vz = moveInput.z;
         if (keys['KeyA'] || keys['ArrowLeft']) vx -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) vx += 1;
@@ -1927,7 +1920,6 @@
           vx /= Math.max(1, len); vz /= Math.max(1, len);
           const speed = 7.8 * state.speedMultiplier;
           
-          // 카메라 시점 각도 기준 정확한 이동 벡터 산출
           const moveDir = new THREE.Vector3(vx, 0, vz).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleY);
           playerGroup.position.x += moveDir.x * speed * dt;
           playerGroup.position.z += moveDir.z * speed * dt;
@@ -1986,9 +1978,6 @@
         if (jumpHeight > 0.08) {
           s.group.position.x += Math.cos(s.moveAngle) * 2.2 * dt;
           s.group.position.z += Math.sin(s.moveAngle) * 2.2 * dt;
-        }
-        if (cycle < 0.25 && s.lastHopSoundPhase > 2.5) {
-          if (s.group.position.distanceTo(playerGroup.position) < 18) playSlimeBounceSound();
         }
         s.lastHopSoundPhase = cycle;
         s.group.position.x = Math.max(-110, Math.min(-65, s.group.position.x));
