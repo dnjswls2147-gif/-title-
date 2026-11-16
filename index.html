@@ -28,11 +28,12 @@
       inset: 0;
       width: 100vw;
       height: 100vh;
+      z-index: 1;
     }
     canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 100% !important;
+      height: 100% !important;
     }
 
     #portrait-warning {
@@ -65,7 +66,7 @@
       position: fixed;
       inset: 0;
       background: radial-gradient(circle at center, rgba(28, 45, 72, 0.95), rgba(10, 16, 28, 0.99));
-      z-index: 500;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -142,6 +143,7 @@
       align-items: flex-start;
       padding: 12px 16px;
       width: 100%;
+      pointer-events: auto;
     }
     .top-left-group, .top-right-group {
       display: flex;
@@ -175,6 +177,7 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
+      pointer-events: auto;
     }
     .exp-box {
       background: rgba(15, 23, 42, 0.9);
@@ -219,6 +222,7 @@
       letter-spacing: 1px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.55);
       z-index: 320;
+      pointer-events: none;
     }
 
     #toast-msg {
@@ -237,7 +241,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s, transform 0.25s;
-      z-index: 300;
+      z-index: 500;
       white-space: nowrap;
       max-width: 92%;
       text-align: center;
@@ -259,7 +263,7 @@
       color: #fff;
       pointer-events: auto;
       box-shadow: 0 12px 35px rgba(0,0,0,0.65);
-      z-index: 250;
+      z-index: 400;
     }
     #inventory-panel { left: 16px; }
     #upgrade-panel { left: 16px; top: 185px; }
@@ -481,6 +485,8 @@
       font-weight: 900;
       text-shadow: 0 1px 3px #000;
       animation: floatRegen 0.6s ease-out forwards;
+      pointer-events: none;
+      z-index: 500;
     }
     @keyframes floatRegen {
       0% { opacity: 1; transform: translateY(0) scale(1); }
@@ -529,6 +535,8 @@
       font-weight: 900;
       text-shadow: 0 2px 4px #000;
       animation: floatUp 0.75s ease-out forwards;
+      pointer-events: none;
+      z-index: 500;
     }
     @keyframes floatUp {
       0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -651,18 +659,25 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    let renderer, camera;
+
+    function resizeRenderer() {
+      if (renderer && camera) {
+        const w = window.innerWidth || document.documentElement.clientWidth;
+        const h = window.innerHeight || document.documentElement.clientHeight;
+        renderer.setSize(w, h, true);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+    }
+
     function requestFullScreenMode() {
       const docEl = document.documentElement;
       const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
       if (req && !document.fullscreenElement) {
         req.call(docEl).then(() => {
-          setTimeout(() => {
-            if (renderer && camera) {
-              renderer.setSize(window.innerWidth, window.innerHeight);
-              camera.aspect = window.innerWidth / window.innerHeight;
-              camera.updateProjectionMatrix();
-            }
-          }, 300);
+          setTimeout(resizeRenderer, 200);
+          setTimeout(resizeRenderer, 500);
         }).catch(() => {});
       }
     }
@@ -864,16 +879,17 @@
       updatePlayerUI();
       initMultiplayer();
       showToast(`환영합니다, ${state.nickname}님! 모험을 시작합니다.`);
+      setTimeout(resizeRenderer, 150);
     });
 
-    // Three.js 3D 월드
+    // Three.js 3D 월드 설정
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.Fog(0x87ceeb, 55, 135);
 
-    const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 260);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 260);
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -1385,13 +1401,17 @@
     let peer = null; let myPeerId = null;
     const remotePlayers = {}; const connections = {};
     function initMultiplayer() {
-      peer = new Peer(null, { debug: 0 });
-      peer.on('open', (id) => {
-        myPeerId = id;
-        const conn = peer.connect('slime_kingdom_room_v2');
-        setupConnection(conn);
-        peer.on('connection', (incomingConn) => setupConnection(incomingConn));
-      });
+      try {
+        peer = new Peer(null, { debug: 0 });
+        peer.on('open', (id) => {
+          myPeerId = id;
+          const conn = peer.connect('slime_kingdom_room_v2');
+          setupConnection(conn);
+          peer.on('connection', (incomingConn) => setupConnection(incomingConn));
+        });
+      } catch (e) {
+        console.log('Multiplayer init skipped:', e);
+      }
     }
 
     function setupConnection(conn) {
@@ -1449,142 +1469,143 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      const dt = Math.min(clock.getDelta(), 0.1);
-      const elapsed = clock.getElapsedTime();
+      try {
+        const dt = Math.min(clock.getDelta(), 0.1);
+        const elapsed = clock.getElapsedTime();
 
-      if (state.started) {
-        let vx = moveInput.x; let vz = moveInput.z;
-        if (keys['KeyA'] || keys['ArrowLeft']) vx -= 1;
-        if (keys['KeyD'] || keys['ArrowRight']) vx += 1;
-        if (keys['KeyW'] || keys['ArrowUp']) vz -= 1;
-        if (keys['KeyS'] || keys['ArrowDown']) vz += 1;
+        if (state.started) {
+          let vx = moveInput.x; let vz = moveInput.z;
+          if (keys['KeyA'] || keys['ArrowLeft']) vx -= 1;
+          if (keys['KeyD'] || keys['ArrowRight']) vx += 1;
+          if (keys['KeyW'] || keys['ArrowUp']) vz -= 1;
+          if (keys['KeyS'] || keys['ArrowDown']) vz += 1;
 
-        const len = Math.hypot(vx, vz);
-        if (len > 0.05) {
-          vx /= Math.max(1, len); vz /= Math.max(1, len);
-          const speed = 7.8 * state.speedMultiplier;
-          playerGroup.position.x += vx * speed * dt;
-          playerGroup.position.z += vz * speed * dt;
+          const len = Math.hypot(vx, vz);
+          if (len > 0.05) {
+            vx /= Math.max(1, len); vz /= Math.max(1, len);
+            const speed = 7.8 * state.speedMultiplier;
+            playerGroup.position.x += vx * speed * dt;
+            playerGroup.position.z += vz * speed * dt;
 
-          playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
-          playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
+            playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
+            playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
 
-          if (playerGroup.position.x > -15 && playerGroup.position.x < 15 && playerGroup.position.z < -2.0) {
-            playerGroup.position.z = -2.0;
+            if (playerGroup.position.x > -15 && playerGroup.position.x < 15 && playerGroup.position.z < -2.0) {
+              playerGroup.position.z = -2.0;
+            }
+
+            if (atkTouchId === null) {
+              playerGroup.rotation.y = Math.atan2(vx, vz);
+            }
+            playerGroup.position.y = Math.abs(Math.sin(elapsed * 14)) * 0.14;
+            playGrassStepSound();
+
+            netSyncTimer += dt;
+            if (netSyncTimer > 0.1) {
+              netSyncTimer = 0;
+              broadcastData({ type: 'move', name: state.nickname, x: playerGroup.position.x, z: playerGroup.position.z, level: state.level });
+            }
+          } else {
+            playerGroup.position.y = 0;
           }
 
-          if (atkTouchId === null) {
-            playerGroup.rotation.y = Math.atan2(vx, vz);
-          }
-          playerGroup.position.y = Math.abs(Math.sin(elapsed * 14)) * 0.14;
-          playGrassStepSound();
+          const atEdge = (
+            playerGroup.position.x <= MAP_MIN_X + 1.5 || playerGroup.position.x >= MAP_MAX_X - 1.5 ||
+            playerGroup.position.z <= MAP_MIN_Z + 1.5 || playerGroup.position.z >= MAP_MAX_Z - 1.5
+          );
+          wipBanner.style.display = atEdge ? 'block' : 'none';
 
-          netSyncTimer += dt;
-          if (netSyncTimer > 0.1) {
-            netSyncTimer = 0;
-            broadcastData({ type: 'move', name: state.nickname, x: playerGroup.position.x, z: playerGroup.position.z, level: state.level });
+          if (state.hp < state.maxHp && (elapsed - state.lastDamageTime) > 1.0) {
+            if ((elapsed - state.lastRegenTick) > 0.2) {
+              state.lastRegenTick = elapsed;
+              state.hp = Math.min(state.maxHp, state.hp + 2);
+              updatePlayerUI();
+              spawnRegenPopup(playerGroup.position, '+2 ➕️');
+            }
           }
+
+          if (state.isAttacking) {
+            state.attackTimer -= dt;
+            const progress = 1 - (state.attackTimer / 0.25);
+            weaponPivot.rotation.x = Math.sin(progress * Math.PI) * 1.45;
+            weaponPivot.rotation.y = Math.sin(progress * Math.PI) * 0.9;
+            if (state.attackTimer <= 0) { state.isAttacking = false; weaponPivot.rotation.set(0, 0, 0); }
+          }
+        }
+
+        slimes.forEach(s => {
+          s.aiTimer -= dt;
+          if (s.aiTimer <= 0) { s.moveAngle = Math.random() * Math.PI * 2; s.aiTimer = 1.6 + Math.random() * 2.2; }
+          const cycle = (elapsed * 3.8 + s.hopPhase) % Math.PI;
+          const jumpHeight = Math.sin(cycle) * 1.15;
+          if (jumpHeight > 0.08) {
+            s.group.position.x += Math.cos(s.moveAngle) * 2.2 * dt;
+            s.group.position.z += Math.sin(s.moveAngle) * 2.2 * dt;
+          }
+          if (cycle < 0.25 && s.lastHopSoundPhase > 2.5) {
+            if (s.group.position.distanceTo(playerGroup.position) < 18) playSlimeBounceSound();
+          }
+          s.lastHopSoundPhase = cycle;
+          s.group.position.x = Math.max(-110, Math.min(-65, s.group.position.x));
+          s.group.position.z = Math.max(-22, Math.min(22, s.group.position.z));
+          s.mesh.position.y = 0.58 + jumpHeight;
+
+          s.attackCooldown -= dt;
+          if (state.started && s.group.position.distanceTo(playerGroup.position) < 1.25 && s.attackCooldown <= 0) {
+            s.attackCooldown = 1.4;
+            state.hp = Math.max(0, state.hp - 3);
+            state.lastDamageTime = elapsed;
+            playSlimeHitSound();
+            spawnDamagePopup(playerGroup.position, `-3 HP`);
+            updatePlayerUI();
+            if (state.hp <= 0) {
+              showToast('💀 체력이 0이 되었습니다! 왕국 앞에서 부활합니다.');
+              state.hp = state.maxHp; playerGroup.position.set(0, 0, 9);
+              updatePlayerUI();
+            }
+          }
+          updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
+        });
+
+        Object.values(remotePlayers).forEach(rp => {
+          rp.group.position.lerp(rp.targetPos, 0.15);
+          updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
+        });
+
+        let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
+        if (state.camMode === 'firstperson') {
+          const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
+          targetCamX = playerGroup.position.x - forward.x * 2.2;
+          targetCamY = playerGroup.position.y + 1.8;
+          targetCamZ = playerGroup.position.z - forward.z * 2.2;
+          lookX = playerGroup.position.x + forward.x * 4;
+          lookY = playerGroup.position.y + 1.2;
+          lookZ = playerGroup.position.z + forward.z * 4;
         } else {
-          playerGroup.position.y = 0;
+          targetCamX = playerGroup.position.x;
+          targetCamY = 18.5;
+          targetCamZ = playerGroup.position.z + 11.5;
+          lookX = playerGroup.position.x;
+          lookY = 0.5;
+          lookZ = playerGroup.position.z - 0.5;
         }
 
-        const atEdge = (
-          playerGroup.position.x <= MAP_MIN_X + 1.5 || playerGroup.position.x >= MAP_MAX_X - 1.5 ||
-          playerGroup.position.z <= MAP_MIN_Z + 1.5 || playerGroup.position.z >= MAP_MAX_Z - 1.5
-        );
-        wipBanner.style.display = atEdge ? 'block' : 'none';
+        camera.position.x += (targetCamX - camera.position.x) * 0.15;
+        camera.position.y += (targetCamY - camera.position.y) * 0.15;
+        camera.position.z += (targetCamZ - camera.position.z) * 0.15;
+        camera.lookAt(lookX, lookY, lookZ);
 
-        if (state.hp < state.maxHp && (elapsed - state.lastDamageTime) > 1.0) {
-          if ((elapsed - state.lastRegenTick) > 0.2) {
-            state.lastRegenTick = elapsed;
-            state.hp = Math.min(state.maxHp, state.hp + 2);
-            updatePlayerUI();
-            spawnRegenPopup(playerGroup.position, '+2 ➕️');
-          }
-        }
+        if (state.started) updateScreenLabel(playerGroup.position, 2.75, playerLabelEl);
+        labelsData.forEach(g => updateScreenLabel(g.obj.position, g.offset, g.el));
 
-        if (state.isAttacking) {
-          state.attackTimer -= dt;
-          const progress = 1 - (state.attackTimer / 0.25);
-          weaponPivot.rotation.x = Math.sin(progress * Math.PI) * 1.45;
-          weaponPivot.rotation.y = Math.sin(progress * Math.PI) * 0.9;
-          if (state.attackTimer <= 0) { state.isAttacking = false; weaponPivot.rotation.set(0, 0, 0); }
-        }
+        renderer.render(scene, camera);
+      } catch (err) {
+        console.error("Animation error:", err);
       }
-
-      slimes.forEach(s => {
-        s.aiTimer -= dt;
-        if (s.aiTimer <= 0) { s.moveAngle = Math.random() * Math.PI * 2; s.aiTimer = 1.6 + Math.random() * 2.2; }
-        const cycle = (elapsed * 3.8 + s.hopPhase) % Math.PI;
-        const jumpHeight = Math.sin(cycle) * 1.15;
-        if (jumpHeight > 0.08) {
-          s.group.position.x += Math.cos(s.moveAngle) * 2.2 * dt;
-          s.group.position.z += Math.sin(s.moveAngle) * 2.2 * dt;
-        }
-        if (cycle < 0.25 && s.lastHopSoundPhase > 2.5) {
-          if (s.group.position.distanceTo(playerGroup.position) < 18) playSlimeBounceSound();
-        }
-        s.lastHopSoundPhase = cycle;
-        s.group.position.x = Math.max(-110, Math.min(-65, s.group.position.x));
-        s.group.position.z = Math.max(-22, Math.min(22, s.group.position.z));
-        s.mesh.position.y = 0.58 + jumpHeight;
-
-        s.attackCooldown -= dt;
-        if (state.started && s.group.position.distanceTo(playerGroup.position) < 1.25 && s.attackCooldown <= 0) {
-          s.attackCooldown = 1.4;
-          state.hp = Math.max(0, state.hp - 3);
-          state.lastDamageTime = elapsed;
-          playSlimeHitSound();
-          spawnDamagePopup(playerGroup.position, `-3 HP`);
-          updatePlayerUI();
-          if (state.hp <= 0) {
-            showToast('💀 체력이 0이 되었습니다! 왕국 앞에서 부활합니다.');
-            state.hp = state.maxHp; playerGroup.position.set(0, 0, 9);
-            updatePlayerUI();
-          }
-        }
-        updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
-      });
-
-      Object.values(remotePlayers).forEach(rp => {
-        rp.group.position.lerp(rp.targetPos, 0.15);
-        updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
-      });
-
-      let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
-      if (state.camMode === 'firstperson') {
-        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
-        targetCamX = playerGroup.position.x - forward.x * 2.2;
-        targetCamY = playerGroup.position.y + 1.8;
-        targetCamZ = playerGroup.position.z - forward.z * 2.2;
-        lookX = playerGroup.position.x + forward.x * 4;
-        lookY = playerGroup.position.y + 1.2;
-        lookZ = playerGroup.position.z + forward.z * 4;
-      } else {
-        targetCamX = playerGroup.position.x;
-        targetCamY = 18.5;
-        targetCamZ = playerGroup.position.z + 11.5;
-        lookX = playerGroup.position.x;
-        lookY = 0.5;
-        lookZ = playerGroup.position.z - 0.5;
-      }
-
-      camera.position.x += (targetCamX - camera.position.x) * 0.15;
-      camera.position.y += (targetCamY - camera.position.y) * 0.15;
-      camera.position.z += (targetCamZ - camera.position.z) * 0.15;
-      camera.lookAt(lookX, lookY, lookZ);
-
-      if (state.started) updateScreenLabel(playerGroup.position, 2.75, playerLabelEl);
-      labelsData.forEach(g => updateScreenLabel(g.obj.position, g.offset, g.el));
-
-      renderer.render(scene, camera);
     }
 
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    window.addEventListener('resize', resizeRenderer);
+    window.addEventListener('orientationchange', () => setTimeout(resizeRenderer, 300));
 
     animate();
   </script>
