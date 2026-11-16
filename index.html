@@ -857,32 +857,33 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     let renderer, camera;
 
     function resizeRenderer() {
+      const w = window.innerWidth || document.documentElement.clientWidth;
+      const h = window.innerHeight || document.documentElement.clientHeight;
       if (renderer && camera) {
-        const w = window.innerWidth || document.documentElement.clientWidth;
-        const h = window.innerHeight || document.documentElement.clientHeight;
-        renderer.setSize(w, h);
+        renderer.setSize(w, h, true);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
       }
     }
 
-    function requestFullScreenMode() {
-      const docEl = document.documentElement;
-      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
-      if (req && !document.fullscreenElement) {
-        req.call(docEl).then(() => setTimeout(resizeRenderer, 200)).catch(() => {});
-      }
-    }
-
     document.getElementById('btn-fullscreen').addEventListener('click', () => {
-      requestFullScreenMode();
       playSound('click');
-      showToast('🖥️ 전체화면 모드 활성화');
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        showToast('🖥️ 전체화면 모드 활성화');
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        showToast('🖥️ 전체화면 해제');
+      }
+      setTimeout(resizeRenderer, 250);
     });
 
     // ==========================================
@@ -990,7 +991,7 @@
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
     const COINS_KEY = 'kingdom_3d_player_coins';
-    const STATS_KEY = 'kingdom_3d_player_stats_v5';
+    const STATS_KEY = 'kingdom_3d_player_stats_v6';
 
     function getSavedStats() {
       try {
@@ -1107,11 +1108,11 @@
     });
 
     window.addEventListener('pointerdown', () => {
-      if (state.started) { initAudio(); requestFullScreenMode(); }
+      if (state.started) { initAudio(); }
     }, { once: true });
 
     document.getElementById('start-game-btn').addEventListener('click', () => {
-      initAudio(); requestFullScreenMode();
+      initAudio();
       playSound('click');
       const input = document.getElementById('nickname-input');
       const errEl = document.getElementById('nickname-error');
@@ -1135,11 +1136,12 @@
       document.getElementById('hud').style.display = 'block';
       updatePlayerUI();
       initMultiplayer();
+      setTimeout(resizeRenderer, 100);
       showToast(`환영합니다, ${state.nickname}님! 모험을 시작합니다.`);
     });
 
     // ==========================================
-    // Three.js 3D 월드 (안전한 안전 구조)
+    // Three.js 3D 월드 (안전한 렌더러 구조)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
@@ -1147,7 +1149,7 @@
     scene.fog = new THREE.Fog(0x87ceeb, 65, 150);
 
     camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 300);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
@@ -1568,7 +1570,6 @@
     function triggerAttack(dirX, dirZ) {
       if (!state.started || state.isAttacking) return;
       
-      // 나무 막대기를 장착 해제했다면 공격 불가 제한
       if (!state.equipped.includes('stick')) {
         showToast('❌ 나무 막대기를 장착해야 공격할 수 있습니다!');
         return;
@@ -1835,7 +1836,7 @@
       try {
         peer = new Peer(null, { debug: 0 });
         peer.on('open', () => {
-          const conn = peer.connect('slime_kingdom_room_v5');
+          const conn = peer.connect('slime_kingdom_room_v6');
           setupConnection(conn);
           peer.on('connection', (incomingConn) => setupConnection(incomingConn));
         });
@@ -2058,6 +2059,7 @@
 
     window.addEventListener('resize', resizeRenderer);
     window.addEventListener('orientationchange', () => setTimeout(resizeRenderer, 300));
+    resizeRenderer();
 
     animate();
   </script>
