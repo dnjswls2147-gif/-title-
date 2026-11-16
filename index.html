@@ -178,6 +178,7 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
+      pointer-events: auto;
     }
     .exp-box {
       background: rgba(15, 23, 42, 0.9);
@@ -193,7 +194,7 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.45);
     }
     .exp-bar-bg {
-      width: 110px;
+      width: 120px;
       height: 8px;
       background: rgba(255,255,255,0.18);
       border-radius: 4px;
@@ -204,6 +205,49 @@
       height: 100%;
       background: linear-gradient(90deg, #38bdf8, #818cf8);
       transition: width 0.25s;
+    }
+
+    /* 오른쪽 위 퀘스트 위젯 */
+    #quest-widget {
+      position: fixed;
+      top: 65px;
+      right: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #ffd54f;
+      padding: 8px 14px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      z-index: 120;
+      display: none;
+      pointer-events: none;
+    }
+
+    /* 장착된 지도 동그라미 아이콘 (강화 버튼 아래) */
+    #equipped-map-badge {
+      position: fixed;
+      left: 16px;
+      top: 132px;
+      width: 52px;
+      height: 52px;
+      background: rgba(245, 158, 11, 0.9);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      z-index: 120;
+      animation: pulseMap 1.8s infinite;
+    }
+    @keyframes pulseMap {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
 
     #wip-banner {
@@ -227,7 +271,7 @@
 
     #toast-msg {
       position: fixed;
-      top: 96px;
+      top: 110px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.95);
@@ -241,7 +285,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s, transform 0.25s;
-      z-index: 500;
+      z-index: 600;
       white-space: nowrap;
       max-width: 92%;
       text-align: center;
@@ -251,6 +295,43 @@
       transform: translateX(-50%) translateY(4px);
     }
 
+    /* 화면 가운데 퀘스트 대화창 팝업 */
+    #dialog-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 700;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+    .dialog-box {
+      background: rgba(18, 25, 40, 0.98);
+      border: 3px solid #ffd54f;
+      border-radius: 20px;
+      padding: 24px 30px;
+      width: 90%;
+      max-width: 440px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.7);
+    }
+    .dialog-box h3 { color: #ffd54f; font-size: 20px; margin-bottom: 12px; }
+    .dialog-box p { font-size: 15px; line-height: 1.5; color: #e2e8f0; margin-bottom: 20px; }
+    .dialog-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      color: #fff;
+      padding: 11px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+    .dialog-btn:active { transform: scale(0.96); }
+
     .modal-panel {
       display: none;
       position: fixed;
@@ -259,14 +340,14 @@
       border: 2px solid rgba(255,255,255,0.28);
       border-radius: 16px;
       padding: 18px;
-      width: 310px;
+      width: 320px;
       color: #fff;
       pointer-events: auto;
       box-shadow: 0 12px 35px rgba(0,0,0,0.65);
-      z-index: 400;
+      z-index: 500;
     }
-    #inventory-panel { left: 16px; }
-    #upgrade-panel { left: 16px; top: 105px; }
+    #inventory-panel { left: 16px; max-height: 80vh; overflow-y: auto; }
+    #upgrade-panel { left: 16px; top: 135px; }
     #guide-panel { right: 16px; width: 320px; }
 
     .panel-header {
@@ -299,21 +380,36 @@
     .item-slot {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
       background: rgba(255,255,255,0.08);
       border: 2px solid #f59e0b;
       border-radius: 12px;
       padding: 10px;
+      margin-bottom: 8px;
     }
+    .item-left { display: flex; align-items: center; gap: 10px; }
     .item-icon {
-      font-size: 28px;
+      font-size: 26px;
       background: rgba(0,0,0,0.35);
-      width: 46px; height: 46px;
+      width: 42px; height: 42px;
       display: flex; align-items: center; justify-content: center;
       border-radius: 10px;
     }
-    .item-info h4 { font-size: 14px; color: #fff; margin-bottom: 3px; }
-    .item-info p { font-size: 12px; color: #fbbf24; font-weight: 700; }
+    .item-info h4 { font-size: 13px; color: #fff; margin-bottom: 2px; }
+    .item-info p { font-size: 11px; color: #fbbf24; font-weight: 700; }
+    
+    .equip-action-btn {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .equip-action-btn.equipped { background: #ef4444; }
+    .equip-action-btn:active { transform: scale(0.95); }
 
     .upgrade-list {
       display: flex;
@@ -565,6 +661,21 @@
   <div id="wip-banner">🚧 제작중...</div>
   <div id="toast-msg"></div>
 
+  <!-- 퀘스트 현황 위젯 (오른쪽 위) -->
+  <div id="quest-widget">📜 슬라임 5마리 처치하기: <span id="quest-count-num">0</span>/5</div>
+
+  <!-- 장착한 지도 아이콘 (강화 버튼 아래) -->
+  <div id="equipped-map-badge" title="장착된 지도 (클릭 시 맵 전체 보기)">🗺️</div>
+
+  <!-- 화면 가운데 퀘스트 대화창 팝업 -->
+  <div id="dialog-modal">
+    <div class="dialog-box">
+      <h3 id="dialog-title">가이드 NPC</h3>
+      <p id="dialog-text">슬라임 5명을 처치해</p>
+      <button class="dialog-btn" id="dialog-confirm-btn">확인</button>
+    </div>
+  </div>
+
   <div id="hud" style="display:none;">
     <div class="top-bar">
       <div class="top-left-group">
@@ -574,9 +685,9 @@
 
       <div class="center-status">
         <div class="exp-box">
-          <span id="hud-lv">Lv.1 / 50</span>
+          <span id="hud-lv">Lv.1</span>
           <div class="exp-bar-bg"><div class="exp-bar-fill" id="hud-exp-bar"></div></div>
-          <span id="hud-slime-count">처치: 0/5</span>
+          <span id="hud-exp-text">0/50</span>
         </div>
       </div>
 
@@ -587,24 +698,41 @@
       </div>
     </div>
 
+    <!-- 인벤토리 창 -->
     <div class="modal-panel" id="inventory-panel">
       <div class="panel-header">
-        <span>🎒 내 인벤토리</span>
+        <span>🎒 내 인벤토리 (장착: <span id="equip-count">0</span>/2)</span>
         <button class="close-btn" onclick="closePanels()">✕</button>
       </div>
       <div class="coin-header-bar">
         <span>💲 보유 코인</span>
         <span id="coin-count-text">0 코인</span>
       </div>
+      <!-- 나무 막대기 슬롯 -->
       <div class="item-slot">
-        <div class="item-icon">🪵</div>
-        <div class="item-info">
-          <h4>나무 막대기 (장착중)</h4>
-          <p id="weapon-dmg-text">공격 데미지: 1</p>
+        <div class="item-left">
+          <div class="item-icon">🪵</div>
+          <div class="item-info">
+            <h4>나무 막대기</h4>
+            <p id="weapon-dmg-text">공격력: +1</p>
+          </div>
         </div>
+        <button class="equip-action-btn" id="btn-equip-stick" onclick="toggleEquip('stick')">장착</button>
+      </div>
+      <!-- 지도 슬롯 -->
+      <div class="item-slot">
+        <div class="item-left">
+          <div class="item-icon">🗺️</div>
+          <div class="item-info">
+            <h4>왕국 지도</h4>
+            <p>효과: 맵 전체 디테일 뷰</p>
+          </div>
+        </div>
+        <button class="equip-action-btn" id="btn-equip-map" onclick="toggleEquip('map')">장착</button>
       </div>
     </div>
 
+    <!-- 캐릭터 강화 패널 -->
     <div class="modal-panel" id="upgrade-panel">
       <div class="panel-header">
         <span>💪 캐릭터 강화소</span>
@@ -626,17 +754,17 @@
       </div>
     </div>
 
+    <!-- 게임 가이드 창 -->
     <div class="modal-panel" id="guide-panel">
       <div class="panel-header">
         <span>📖 게임 가이드</span>
         <button class="close-btn" onclick="closePanels()">✕</button>
       </div>
       <ul class="guide-list">
-        <li>1. 왼쪽 조이스틱은 이동</li>
-        <li>2. 오른쪽 조이스틱은 공격 (방향 드래그 후 떼기)</li>
-        <li>3. 최대 레벨 50</li>
-        <li>4. 10레벨 부터 전직할수있다</li>
-        <li>5. 가이드에 따라 레벨업 하기</li>
+        <li>1. 화면 드래그로 시점(위,아래,좌,우) 회전</li>
+        <li>2. 왼쪽 조이스틱 이동 / 오른쪽 조이스틱 공격</li>
+        <li>3. 가이드 NPC에게 말을 걸어 퀘스트 클리어</li>
+        <li>4. 인벤토리에서 아이템 최대 2개 장착 가능</li>
       </ul>
     </div>
 
@@ -655,9 +783,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // ==========================================
-    // 0. 전체화면 및 리사이즈
-    // ==========================================
     let renderer, camera;
 
     function resizeRenderer() {
@@ -674,19 +799,18 @@
       const docEl = document.documentElement;
       const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
       if (req && !document.fullscreenElement) {
-        req.call(docEl).then(() => {
-          setTimeout(resizeRenderer, 200);
-        }).catch(() => {});
+        req.call(docEl).then(() => setTimeout(resizeRenderer, 200)).catch(() => {});
       }
     }
 
     document.getElementById('btn-fullscreen').addEventListener('click', () => {
       requestFullScreenMode();
-      showToast('🖥️ 전체화면 모드를 활성화했습니다.');
+      playSound('click');
+      showToast('🖥️ 전체화면 모드 활성화');
     });
 
     // ==========================================
-    // 1. 사운드 (Web Audio API)
+    // 효과음 시스템 (Web Audio API)
     // ==========================================
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
@@ -696,6 +820,51 @@
       if (!audioCtx) audioCtx = new AudioCtx();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       startBGM();
+    }
+
+    function playSound(type) {
+      if (!audioCtx || audioCtx.state !== 'running') return;
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, t);
+        osc.frequency.exponentialRampToValueAtTime(900, t + 0.08);
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+        osc.start(t); osc.stop(t + 0.1);
+      } else if (type === 'swing') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(450, t);
+        osc.frequency.exponentialRampToValueAtTime(120, t + 0.15);
+        gain.gain.setValueAtTime(0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        osc.start(t); osc.stop(t + 0.16);
+      } else if (type === 'hit') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, t);
+        osc.frequency.exponentialRampToValueAtTime(560, t + 0.08);
+        gain.gain.setValueAtTime(0.32, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+        osc.start(t); osc.stop(t + 0.19);
+      } else if (type === 'coin') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900, t);
+        osc.frequency.exponentialRampToValueAtTime(1400, t + 0.12);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.start(t); osc.stop(t + 0.16);
+      } else if (type === 'map') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, t);
+        osc.frequency.exponentialRampToValueAtTime(800, t + 0.25);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.28);
+        osc.start(t); osc.stop(t + 0.3);
+      }
     }
 
     function startBGM() {
@@ -712,10 +881,8 @@
         const t = audioCtx.currentTime;
         gain.gain.setValueAtTime(0.03, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(t);
-        osc.stop(t + 0.65);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(t); osc.stop(t + 0.65);
       }, 700);
     }
 
@@ -741,71 +908,26 @@
       noise.start();
     }
 
-    function playStickSwingSound() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      const t = audioCtx.currentTime;
-      osc.frequency.setValueAtTime(450, t);
-      osc.frequency.exponentialRampToValueAtTime(120, t + 0.15);
-      gain.gain.setValueAtTime(0.28, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.16);
-    }
-
-    function playSlimeBounceSound() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      const t = audioCtx.currentTime;
-      osc.frequency.setValueAtTime(190, t);
-      osc.frequency.exponentialRampToValueAtTime(420, t + 0.12);
-      gain.gain.setValueAtTime(0.12, t);
-      gain.gain.exponentialRampToValueAtTime(0.005, t + 0.13);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.14);
-    }
-
-    function playSlimeHitSound() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      const t = audioCtx.currentTime;
-      osc.frequency.setValueAtTime(260, t);
-      osc.frequency.exponentialRampToValueAtTime(560, t + 0.08);
-      osc.frequency.exponentialRampToValueAtTime(150, t + 0.18);
-      gain.gain.setValueAtTime(0.32, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(t); osc.stop(t + 0.19);
-    }
-
     // ==========================================
-    // 2. 플레이어 상태 및 데이터 저장
+    // 플레이어 및 퀘스트 상태 관리
     // ==========================================
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
     const COINS_KEY = 'kingdom_3d_player_coins';
-    const STATS_KEY = 'kingdom_3d_player_stats_v2';
+    const STATS_KEY = 'kingdom_3d_player_stats_v3';
 
     function getSavedStats() {
       try {
-        return JSON.parse(localStorage.getItem(STATS_KEY)) || { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0 };
+        return JSON.parse(localStorage.getItem(STATS_KEY)) || { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: [] };
       } catch {
-        return { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0 };
+        return { maxHp: 30, dmg: 1, spdMultiplier: 1.0, spdLevel: 0, level: 1, exp: 0, equipped: [] };
       }
     }
 
     function saveStats() {
       localStorage.setItem(STATS_KEY, JSON.stringify({
-        maxHp: state.maxHp,
-        dmg: state.damage,
-        spdMultiplier: state.speedMultiplier,
-        spdLevel: state.speedLevel
+        maxHp: state.maxHp, dmg: state.damage, spdMultiplier: state.speedMultiplier,
+        spdLevel: state.speedLevel, level: state.level, exp: state.exp, equipped: state.equipped
       }));
     }
 
@@ -813,24 +935,29 @@
     const state = {
       started: false,
       nickname: localStorage.getItem(STORAGE_KEY) || '',
-      level: 1,
+      level: savedStats.level || 1,
       maxLevel: 50,
-      exp: 0,
-      maxExp: 15,
+      exp: savedStats.exp || 0,
       damage: savedStats.dmg,
       hp: savedStats.maxHp,
       maxHp: savedStats.maxHp,
       coins: parseInt(localStorage.getItem(COINS_KEY) || '0', 10),
       speedMultiplier: savedStats.spdMultiplier,
       speedLevel: savedStats.spdLevel,
+      equipped: savedStats.equipped || [], // 최대 2개 ('stick', 'map')
       isAttacking: false,
       attackTimer: 0,
+      questStage: 0, // 0: 시작전, 1: 5마리 잡기 진행중, 2: 5마리 완료, 3: 5렙 달성 진행중, 4: 완료
       questProgress: 0,
-      questCompleted: false,
       camMode: 'topdown',
+      isMapZoomed: false,
       lastDamageTime: -10,
       lastRegenTick: 0
     };
+
+    function getRequiredExp(lvl) {
+      return 50 + (lvl - 1) * 20;
+    }
 
     const toastEl = document.getElementById('toast-msg');
     let toastTimeout = null;
@@ -847,7 +974,46 @@
       document.getElementById('stat-hp-val').textContent = state.maxHp;
       document.getElementById('stat-dmg-val').textContent = state.damage;
       document.getElementById('stat-spd-val').textContent = `${state.speedLevel}강`;
-      document.getElementById('weapon-dmg-text').textContent = `공격 데미지: ${state.damage}`;
+      document.getElementById('weapon-dmg-text').textContent = `공격력: +${state.damage}`;
+      document.getElementById('equip-count').textContent = state.equipped.length;
+
+      // 장착 버튼 상태 동기화
+      const stickBtn = document.getElementById('btn-equip-stick');
+      const mapBtn = document.getElementById('btn-equip-map');
+      const mapBadge = document.getElementById('equipped-map-badge');
+
+      if (state.equipped.includes('stick')) {
+        stickBtn.textContent = '장착해제'; stickBtn.classList.add('equipped');
+      } else {
+        stickBtn.textContent = '장착'; stickBtn.classList.remove('equipped');
+      }
+
+      if (state.equipped.includes('map')) {
+        mapBtn.textContent = '장착해제'; mapBtn.classList.add('equipped');
+        mapBadge.style.display = 'flex';
+      } else {
+        mapBtn.textContent = '장착'; mapBtn.classList.remove('equipped');
+        mapBadge.style.display = 'none';
+        state.isMapZoomed = false;
+      }
+    }
+
+    function toggleEquip(itemId) {
+      playSound('click');
+      if (state.equipped.includes(itemId)) {
+        state.equipped = state.equipped.filter(id => id !== itemId);
+        showToast(`🎒 인벤토리: ${itemId === 'stick' ? '나무 막대기' : '왕국 지도'} 장착 해제`);
+      } else {
+        if (state.equipped.length >= 2) {
+          showToast('❌ 아이템 2개를 이미 착용 했습니다.');
+          return;
+        }
+        state.equipped.push(itemId);
+        showToast(`🎒 인벤토리: ${itemId === 'stick' ? '나무 막대기' : '왕국 지도'} 장착 완료!`);
+        if (itemId === 'map') playSound('map');
+      }
+      updateCoinUI();
+      saveStats();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -870,6 +1036,7 @@
 
     document.getElementById('start-game-btn').addEventListener('click', () => {
       initAudio(); requestFullScreenMode();
+      playSound('click');
       const input = document.getElementById('nickname-input');
       const errEl = document.getElementById('nickname-error');
       const raw = input.value.trim();
@@ -896,36 +1063,36 @@
     });
 
     // ==========================================
-    // 3. Three.js 3D 월드 구축 (검은 화면 에러 완벽 수정!)
+    // Three.js 3D 월드 (풀 매우 풍성 + 왕국 & 사냥터 디테일)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.Fog(0x87ceeb, 60, 145);
+    scene.fog = new THREE.Fog(0x87ceeb, 65, 150);
 
-    camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 260);
+    camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 300);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfff5e4, 0.85);
+    const dirLight = new THREE.DirectionalLight(0xfff5e4, 0.88);
     dirLight.position.set(25, 50, 30);
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    const MAP_MIN_X = -115;
-    const MAP_MAX_X = 50;
-    const MAP_MIN_Z = -32;
-    const MAP_MAX_Z = 32;
+    const MAP_MIN_X = -120;
+    const MAP_MAX_X = 55;
+    const MAP_MIN_Z = -35;
+    const MAP_MAX_Z = 35;
 
     // 바닥 초원
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(180, 80),
+      new THREE.PlaneGeometry(190, 85),
       new THREE.MeshLambertMaterial({ color: 0x4caf50 })
     );
     ground.rotation.x = -Math.PI / 2;
@@ -933,27 +1100,16 @@
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // 맵 테두리 울타리 (안전한 .position.set 사용)
+    // 테두리 울타리
     const borderMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
-    const topWall = new THREE.Mesh(new THREE.BoxGeometry(170, 1.5, 1), borderMat);
-    topWall.position.set(-32, 0.75, MAP_MIN_Z - 1);
-    scene.add(topWall);
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MIN_Z - 1) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MAX_Z + 1) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MIN_X - 1, 0.75, 0) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MAX_X + 1, 0.75, 0) }));
 
-    const bottomWall = new THREE.Mesh(new THREE.BoxGeometry(170, 1.5, 1), borderMat);
-    bottomWall.position.set(-32, 0.75, MAP_MAX_Z + 1);
-    scene.add(bottomWall);
-
-    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 68), borderMat);
-    leftWall.position.set(MAP_MIN_X - 1, 0.75, 0);
-    scene.add(leftWall);
-
-    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 68), borderMat);
-    rightWall.position.set(MAP_MAX_X + 1, 0.75, 0);
-    scene.add(rightWall);
-
-    // 왼쪽 멀리 떨어진 슬라임 사냥터 영역 (X: -66 ~ -110)
+    // 왼쪽 슬라임 사냥터 바닥
     const huntZone = new THREE.Mesh(
-      new THREE.PlaneGeometry(46, 48),
+      new THREE.PlaneGeometry(50, 52),
       new THREE.MeshLambertMaterial({ color: 0x3b9440 })
     );
     huntZone.rotation.x = -Math.PI / 2;
@@ -962,21 +1118,21 @@
 
     // 왕국 앞 돌길
     const road = new THREE.Mesh(
-      new THREE.PlaneGeometry(14, 24),
+      new THREE.PlaneGeometry(14, 26),
       new THREE.MeshLambertMaterial({ color: 0xe5dec9 })
     );
     road.rotation.x = -Math.PI / 2;
     road.position.set(0, 0.03, 7);
     scene.add(road);
 
-    // 입체 3D 풀(잔디 뭉치) 생성
+    // 풀(잔디 뭉치)을 훨씬 빽빽하고 꽉 채우기 (650개)
     const grassBladeGeo = new THREE.ConeGeometry(0.18, 0.85, 4);
     const grassMat1 = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
     const grassMat2 = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
-    for (let i = 0; i < 320; i++) {
-      const gx = MAP_MIN_X + 3 + Math.random() * (MAP_MAX_X - MAP_MIN_X - 6);
-      const gz = MAP_MIN_Z + 3 + Math.random() * (MAP_MAX_Z - MAP_MIN_Z - 6);
-      if (gx > -15 && gx < 15 && gz > -24 && gz < 16) continue;
+    for (let i = 0; i < 650; i++) {
+      const gx = MAP_MIN_X + 2 + Math.random() * (MAP_MAX_X - MAP_MIN_X - 4);
+      const gz = MAP_MIN_Z + 2 + Math.random() * (MAP_MAX_Z - MAP_MIN_Z - 4);
+      if (gx > -16 && gx < 16 && gz > -26 && gz < 18) continue;
       const tuft = new THREE.Group();
       for (let b = 0; b < 5; b++) {
         const blade = new THREE.Mesh(grassBladeGeo, b % 2 === 0 ? grassMat1 : grassMat2);
@@ -989,7 +1145,7 @@
     }
 
     // ==========================================
-    // 4. 디테일한 중앙 왕국 (진입 불가)
+    // 디테일한 중앙 왕국 (진입 불가)
     // ==========================================
     const kingdomGroup = new THREE.Group();
     kingdomGroup.position.set(0, 0, -14);
@@ -1005,51 +1161,36 @@
     mainCastle.castShadow = true;
     kingdomGroup.add(mainCastle);
 
-    // 성벽 상단 성가퀴
     for (let cx = -4.8; cx <= 4.8; cx += 1.6) {
       const battlement = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.8, 0.6), trimMat);
       battlement.position.set(cx, 6.8, 3.3);
       kingdomGroup.add(battlement);
     }
 
-    // 중앙 파란 지붕
     const mainRoof = new THREE.Mesh(new THREE.ConeGeometry(6.8, 3.8, 4), roofMat);
     mainRoof.position.set(0, 8.4, 0);
     mainRoof.rotation.y = Math.PI / 4;
     kingdomGroup.add(mainRoof);
 
-    // 좌우 쌍둥이 탑
     [-6.2, 6.2].forEach(xPos => {
       const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.9, 8.8, 16), stoneMat);
       tower.position.set(xPos, 4.4, 1.8);
       kingdomGroup.add(tower);
-
       const tRoof = new THREE.Mesh(new THREE.ConeGeometry(2.2, 3.2, 16), roofMat);
       tRoof.position.set(xPos, 10.3, 1.8);
       kingdomGroup.add(tRoof);
-
-      const spire = new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 10), goldMat);
-      spire.position.set(xPos, 12.0, 1.8);
-      kingdomGroup.add(spire);
     });
 
-    // 황금 성문 아치 & 대문
     const archFrame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.8, 0.8), goldMat);
     archFrame.position.set(0, 2.4, 3.45);
     kingdomGroup.add(archFrame);
-
-    const goldGateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
-    goldGateLeft.position.set(-0.92, 2.1, 3.52);
-    kingdomGroup.add(goldGateLeft);
-
-    const goldGateRight = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
-    goldGateRight.position.set(0.92, 2.1, 3.52);
-    kingdomGroup.add(goldGateRight);
+    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(-0.92, 2.1, 3.52) }));
+    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(0.92, 2.1, 3.52) }));
 
     scene.add(kingdomGroup);
 
     // ==========================================
-    // 5. 왕국 지키는 경비원 2명, 오른쪽 가이드 NPC, 왼쪽 1~5레벨 표지판
+    // NPC 및 표지판
     // ==========================================
     const clickableNPCs = [];
     const labelsData = [];
@@ -1061,8 +1202,6 @@
       body.position.y = 0.85; g.add(body);
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), new THREE.MeshLambertMaterial({ color: 0xfde68a }));
       head.position.y = 1.85; g.add(head);
-      const helmet = new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.55, 12), new THREE.MeshLambertMaterial({ color: 0x3b82f6 }));
-      helmet.position.y = 2.25; g.add(helmet);
       scene.add(g);
 
       const hitBox = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.2, 1.8), new THREE.MeshBasicMaterial({ visible: false }));
@@ -1073,24 +1212,21 @@
       const tag = document.createElement('div');
       tag.className = 'float-tag guard-tag';
       tag.textContent = '🛡️ 경비원';
-      tag.addEventListener('click', () => showToast('🛡️ 경비원: "왕국을 지키는 경비원"'));
+      tag.addEventListener('click', () => { playSound('click'); showToast('🛡️ 경비원: "왕국을 지키는 든든한 경비원입니다."'); });
       document.getElementById('floating-labels').appendChild(tag);
       labelsData.push({ obj: g, el: tag, offset: 2.75 });
     }
 
-    // 왕국 앞 지키는 경비원 2명
     createGuard(-7.5, -2.0);
     createGuard(7.5, -2.0);
 
-    // 왕국 오른쪽 옆에 옆에 가이드 NPC (X: 18)
+    // 왕국 오른쪽 옆에 가이드 NPC (X: 18)
     const guideGroup = new THREE.Group();
     guideGroup.position.set(18, 0, -1.5);
     const gBody = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 1.25, 12), new THREE.MeshLambertMaterial({ color: 0xb45309 }));
     gBody.position.y = 0.78; guideGroup.add(gBody);
     const gHead = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 14), new THREE.MeshLambertMaterial({ color: 0xfef08a }));
     gHead.position.y = 1.72; guideGroup.add(gHead);
-    const gHat = new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.4, 12), new THREE.MeshLambertMaterial({ color: 0xd97706 }));
-    gHat.position.y = 2.1; guideGroup.add(gHat);
     scene.add(guideGroup);
 
     const guideHitBox = new THREE.Mesh(new THREE.BoxGeometry(1.8, 3.2, 1.8), new THREE.MeshBasicMaterial({ visible: false }));
@@ -1101,13 +1237,10 @@
     const guideTag = document.createElement('div');
     guideTag.className = 'float-tag npc-tag';
     guideTag.textContent = '가이드 NPC';
-    guideTag.addEventListener('click', () => {
-      showToast(state.questCompleted ? '가이드 NPC: "좋아! 잘했어!"' : '가이드 NPC: "왼쪽 사냥터에서 1~5레벨 슬라임을 처치하세요!"');
-    });
-    document.getElementById('floating-labels').appendChild(guideTag);
+    guideTag.addEventListener('click', () => interactWithGuideNPC());
+    document.getElementById('floating-labels').appendChild(tag = guideTag);
     labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55 });
 
-    // 표지판 생성 함수
     function createSign(x, rotY, title, sub) {
       const signGroup = new THREE.Group();
       signGroup.position.set(x, 0, -1.5);
@@ -1131,14 +1264,11 @@
       scene.add(signGroup);
     }
 
-    // 오른쪽 가이드 표지판
     createSign(22.5, -0.25, '📖 가이드', 'NPC에게 말을 걸어보세요');
-
-    // 왼쪽 1레벨~5레벨 사냥터 표지판 (X: -24) -> 더 왼쪽 옆에 옆에 옆에 슬라임 사냥터(X: -66 ~ -110) 위치!
     createSign(-24, 0.25, '⬅️ 1레벨~5레벨 사냥터', '(더 왼쪽으로 가면 슬라임 사냥터)');
 
     // ==========================================
-    // 6. 내 캐릭터 & 조준선
+    // 내 캐릭터 & 조준선
     // ==========================================
     const playerGroup = new THREE.Group();
     playerGroup.position.set(0, 0, 9);
@@ -1191,16 +1321,93 @@
           <div class="player-hp-text">${state.hp}/${state.maxHp} HP</div>
         </div>
       `;
-      document.getElementById('hud-lv').textContent = `Lv.${state.level} / ${state.maxLevel}`;
-      const pct = Math.min(100, Math.round((state.exp / state.maxExp) * 100));
+      document.getElementById('hud-lv').textContent = `Lv.${state.level}`;
+      const reqExp = getRequiredExp(state.level);
+      const pct = Math.min(100, Math.round((state.exp / reqExp) * 100));
       document.getElementById('hud-exp-bar').style.width = `${pct}%`;
-      document.getElementById('hud-slime-count').textContent = `처치: ${state.questProgress}/5`;
+      document.getElementById('hud-exp-text').textContent = `${state.exp}/${reqExp}`;
+
+      if (state.questStage === 1) {
+        document.getElementById('quest-widget').style.display = 'block';
+        document.getElementById('quest-count-num').textContent = state.questProgress;
+      } else {
+        document.getElementById('quest-widget').style.display = 'none';
+      }
     }
 
     // ==========================================
-    // 7. 슬라임 소환 (왼쪽 표지판보다 더 왼쪽 사냥터)
+    // 가이드 NPC 대화 및 퀘스트 로직
+    // ==========================================
+    function interactWithGuideNPC() {
+      playSound('click');
+      const modal = document.getElementById('dialog-modal');
+      const titleEl = document.getElementById('dialog-title');
+      const textEl = document.getElementById('dialog-text');
+      const btnEl = document.getElementById('dialog-confirm-btn');
+
+      titleEl.textContent = '가이드 NPC';
+
+      if (state.questStage === 0) {
+        textEl.textContent = '슬라임 5명을 처치해';
+        btnEl.textContent = '확인';
+        btnEl.onclick = () => {
+          playSound('click');
+          state.questStage = 1; // 5마리 잡기 퀘스트 시작
+          modal.style.display = 'none';
+          updatePlayerUI();
+          showToast('📜 [슬라임 5마리 처치하기] 퀘스트가 시작되었습니다!');
+        };
+        modal.style.display = 'flex';
+      } else if (state.questStage === 1) {
+        if (state.questProgress < 5) {
+          textEl.textContent = `아직 슬라임을 다 잡지 않았어요! (${state.questProgress}/5)`;
+          btnEl.textContent = '돌아가기';
+          btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; };
+          modal.style.display = 'flex';
+        } else {
+          // 5마리 완료 보상 지급
+          state.coins += 10;
+          updateCoinUI();
+          textEl.textContent = '좋아 잘했어! 보상으로 10코인을 줄게요.';
+          btnEl.textContent = '다음 퀘스트 하기';
+          btnEl.onclick = () => {
+            playSound('click');
+            state.questStage = 3; // 5레벨 달성 퀘스트 시작
+            textEl.textContent = '이제 5레벨 까지 레벨업 하기 퀘스트입니다!';
+            btnEl.textContent = '확인';
+            btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; updatePlayerUI(); };
+            showToast('📜 [5레벨 까지 레벨업 하기] 퀘스트 시작!');
+          };
+          modal.style.display = 'flex';
+        }
+      } else if (state.questStage === 3) {
+        if (state.level < 5) {
+          textEl.textContent = `아직 5레벨이 되지 않았어요! (현재 Lv.${state.level})`;
+          btnEl.textContent = '열심히 할게요';
+          btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; };
+          modal.style.display = 'flex';
+        } else {
+          state.questStage = 4;
+          state.coins += 20;
+          updateCoinUI();
+          textEl.textContent = '와! 5레벨 달성을 축하해요! 20코인 보상 지급!';
+          btnEl.textContent = '완료';
+          btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; };
+          modal.style.display = 'flex';
+        }
+      } else {
+        textEl.textContent = '모든 퀘스트를 완료했습니다! 최고의 용사예요!';
+        btnEl.textContent = '닫기';
+        btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; };
+        modal.style.display = 'flex';
+      }
+    }
+
+    // ==========================================
+    // 슬라임 & 바닥에 떨어지는 코인 (자석 흡수) 시스템
     // ==========================================
     const slimes = [];
+    const droppedCoins = [];
     const MAX_SLIMES = 10;
 
     function spawnSlime() {
@@ -1214,13 +1421,6 @@
       const slimeMesh = new THREE.Mesh(new THREE.SphereGeometry(0.72, 16, 12), slimeMat);
       slimeMesh.scale.set(1.15, 0.82, 1.15); slimeMesh.position.y = 0.58; slimeMesh.castShadow = true;
       sGroup.add(slimeMesh);
-
-      const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
-      [-0.24, 0.24].forEach(ex => {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeMat);
-        eye.position.set(ex, 0.68, 0.68);
-        sGroup.add(eye);
-      });
 
       scene.add(sGroup);
       const tag = document.createElement('div');
@@ -1238,8 +1438,23 @@
     for (let i = 0; i < 6; i++) spawnSlime();
     setInterval(() => { if (state.started) spawnSlime(); }, 8000);
 
+    // 슬라임 처치 시 100% 코인 드롭
+    function dropCoinAt(pos) {
+      const cGroup = new THREE.Group();
+      const coinMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.35, 0.1, 16),
+        new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 })
+      );
+      coinMesh.rotation.x = Math.PI / 2;
+      coinMesh.position.y = 0.3;
+      cGroup.add(coinMesh);
+      cGroup.position.copy(pos);
+      scene.add(cGroup);
+      droppedCoins.push(cGroup);
+    }
+
     // ==========================================
-    // 8. 조이스틱 & 강화 버튼 이벤트
+    // 조이스틱 & 카메라 자유 회전 (위,아래,좌,우 사람처럼)
     // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
@@ -1275,6 +1490,7 @@
     moveZone.addEventListener('pointerup', resetMoveStick);
     moveZone.addEventListener('pointercancel', resetMoveStick);
 
+    // 공격 조이스틱
     const atkZone = document.getElementById('attack-joystick-zone');
     const atkStick = document.getElementById('attack-stick');
     let atkTouchId = null;
@@ -1284,9 +1500,9 @@
       if (!state.started || state.isAttacking) return;
       initAudio();
       state.isAttacking = true; state.attackTimer = 0.25;
-      playStickSwingSound();
+      playSound('swing');
 
-      const angle = Math.atan2(dirX, dirZ);
+      const angle = Math.atan2(dirX, dirZ) + cameraAngleY;
       playerGroup.rotation.y = angle;
 
       const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
@@ -1296,32 +1512,35 @@
         const s = slimes[i];
         if (hitCenter.distanceTo(s.group.position) <= 2.35) {
           s.hp -= state.damage;
-          playSlimeHitSound();
+          playSound('hit');
           spawnDamagePopup(s.group.position, `-${state.damage}`);
           s.group.position.addScaledVector(forward, 0.75);
           s.mesh.material.color.setHex(0xef4444);
           setTimeout(() => { if (s.mesh) s.mesh.material.color.setHex(0x22c55e); }, 140);
 
           if (s.hp <= 0) {
-            scene.remove(s.group); s.labelEl.remove(); slimes.splice(i, 1);
-            if (Math.random() < 0.70) {
-              state.coins += 1; updateCoinUI();
-              showToast('💲 슬라임 처치! +1 코인 획득!');
-            }
-            if (!state.questCompleted) {
+            scene.remove(s.group); s.labelEl.remove();
+            dropCoinAt(s.group.position.clone());
+            slimes.splice(i, 1);
+
+            if (state.questStage === 1 && state.questProgress < 5) {
               state.questProgress++;
               if (state.questProgress >= 5) {
-                state.questCompleted = true;
-                showToast('🎉 슬라임 5마리 처치 완료! 오른쪽 가이드 NPC에게 가보세요!');
+                showToast('🎉 슬라임 5마리 처치 완료! 가이드 NPC에게 가세요!');
               }
             }
-            state.exp += 5;
-            if (state.exp >= state.maxExp && state.level < state.maxLevel) {
-              state.exp -= state.maxExp; state.level += 1;
-              state.maxExp = Math.round(state.maxExp * 1.35);
-              showToast(`🎉 레벨 업! Lv.${state.level} 달성!`);
+
+            // 경험치 및 레벨업 (필요 경험치: 50 + (lvl-1)*20)
+            state.exp += 25;
+            const reqExp = getRequiredExp(state.level);
+            if (state.exp >= reqExp && state.level < state.maxLevel) {
+              state.exp -= reqExp;
+              state.level += 1;
+              state.coins += 5; // 레벨업 시 코인 5개 보상
+              showToast(`🎉 레벨 업! Lv.${state.level} 달성! (+5 코인)`);
             }
             updatePlayerUI();
+            saveStats();
           } else {
             s.labelEl.querySelector('.slime-hp-text').textContent = `슬라임 ${s.hp}/${s.maxHp} HP`;
             s.labelEl.querySelector('.slime-hp-fill').style.width = `${(s.hp / s.maxHp) * 100}%`;
@@ -1334,8 +1553,6 @@
       e.stopPropagation(); initAudio();
       atkTouchId = e.pointerId; atkZone.setPointerCapture(e.pointerId);
       aimGuide.visible = true;
-      aimDirX = Math.sin(playerGroup.rotation.y);
-      aimDirZ = Math.cos(playerGroup.rotation.y);
     });
     atkZone.addEventListener('pointermove', (e) => {
       if (e.pointerId !== atkTouchId) return;
@@ -1348,7 +1565,7 @@
       atkStick.style.transform = `translate(${clampX}px, ${clampY}px)`;
       if (dist > 6) {
         aimDirX = dx / dist; aimDirZ = dy / dist;
-        playerGroup.rotation.y = Math.atan2(aimDirX, aimDirZ);
+        playerGroup.rotation.y = Math.atan2(aimDirX, aimDirZ) + cameraAngleY;
       }
     });
     const resetAtkStick = (e) => {
@@ -1361,12 +1578,67 @@
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
 
-    // 캐릭터 강화 버튼
+    // ==========================================
+    // 화면 드래그로 사람처럼 카메라 시점 회전 (위,아래,좌,우)
+    // ==========================================
+    let isDraggingScreen = false;
+    let prevMouseX = 0; let prevMouseY = 0;
+    let cameraAngleY = 0; // 좌우 회전각
+    let cameraAngleX = 0.45; // 상하 피치각
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (!state.started) return;
+      // 조이스틱 영역 터치는 제외
+      if (e.clientX < 180 && e.clientY > window.innerHeight - 180) return;
+      if (e.clientX > window.innerWidth - 180 && e.clientY > window.innerHeight - 180) return;
+      isDraggingScreen = true;
+      prevMouseX = e.clientX; prevMouseY = e.clientY;
+    });
+
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      if (!isDraggingScreen) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+
+      cameraAngleY -= dx * 0.005;
+      cameraAngleX += dy * 0.005;
+      cameraAngleX = Math.max(0.1, Math.min(1.35, cameraAngleX)); // 너무 위/아래로 뒤집히지 않게 제한
+
+      prevMouseX = e.clientX; prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('pointerup', () => { isDraggingScreen = false; });
+
+    // NPC 클릭 판정
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    renderer.domElement.addEventListener('click', (e) => {
+      if (!state.started) return;
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(clickableNPCs.map(g => g.mesh));
+      if (hits.length > 0) {
+        const found = clickableNPCs.find(g => g.mesh === hits[0].object);
+        if (found) {
+          if (found.type === 'guard') { playSound('click'); showToast('🛡️ 경비원: "왕국을 지키는 든든한 경비원입니다."'); }
+          else if (found.type === 'guide') { interactWithGuideNPC(); }
+        }
+      }
+    });
+
+    // 장착한 지도 아이콘 클릭 시 전체 맵 줌 토글
+    document.getElementById('equipped-map-badge').addEventListener('click', () => {
+      playSound('map');
+      state.isMapZoomed = !state.isMapZoomed;
+      showToast(state.isMapZoomed ? '🗺️ 왕국 지도 활성화: 맵 전체 뷰' : '🗺️ 지도를 접었습니다.');
+    });
+
+    // 강화 버튼 이벤트
     document.getElementById('up-hp-btn').addEventListener('click', () => {
+      playSound('click');
       if (state.coins >= 5) {
-        state.coins -= 5;
-        state.maxHp += 5;
-        state.hp += 5;
+        state.coins -= 5; state.maxHp += 5; state.hp += 5;
         updateCoinUI(); updatePlayerUI(); saveStats();
         showToast('❤️ 최대 체력 강화 완료! (+5 HP)');
       } else {
@@ -1375,9 +1647,9 @@
     });
 
     document.getElementById('up-dmg-btn').addEventListener('click', () => {
+      playSound('click');
       if (state.coins >= 5) {
-        state.coins -= 5;
-        state.damage += 2;
+        state.coins -= 5; state.damage += 2;
         updateCoinUI(); saveStats();
         showToast('⚔️ 공격력 강화 완료! (+2 데미지)');
       } else {
@@ -1386,10 +1658,9 @@
     });
 
     document.getElementById('up-spd-btn').addEventListener('click', () => {
+      playSound('click');
       if (state.coins >= 5) {
-        state.coins -= 5;
-        state.speedMultiplier *= 1.15;
-        state.speedLevel += 1;
+        state.coins -= 5; state.speedMultiplier *= 1.15; state.speedLevel += 1;
         updateCoinUI(); saveStats();
         showToast('⚡ 스피드 강화 완료! (1.15배)');
       } else {
@@ -1397,8 +1668,9 @@
       }
     });
 
-    // 시점 변경
+    // 시점 모드 변경 버튼
     document.getElementById('btn-cam-mode').addEventListener('click', () => {
+      playSound('click');
       if (state.camMode === 'topdown') {
         state.camMode = 'firstperson';
         document.getElementById('btn-cam-mode').textContent = '🎥 시점: 1인칭';
@@ -1417,39 +1689,24 @@
     }
 
     document.getElementById('btn-inventory').addEventListener('click', () => {
+      playSound('click');
       const p = document.getElementById('inventory-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
 
     document.getElementById('btn-upgrade').addEventListener('click', () => {
+      playSound('click');
       const p = document.getElementById('upgrade-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
     });
 
     document.getElementById('btn-guide').addEventListener('click', () => {
+      playSound('click');
       const p = document.getElementById('guide-panel');
       const isOpen = p.style.display === 'block';
       closePanels(); p.style.display = isOpen ? 'none' : 'block';
-    });
-
-    // NPC 클릭 판정
-    const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
-    renderer.domElement.addEventListener('pointerdown', (e) => {
-      if (!state.started) return;
-      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects(clickableNPCs.map(g => g.mesh));
-      if (hits.length > 0) {
-        const found = clickableNPCs.find(g => g.mesh === hits[0].object);
-        if (found) {
-          if (found.type === 'guard') showToast('🛡️ 경비원: "왕국을 지키는 경비원"');
-          else if (found.type === 'guide') showToast(state.questCompleted ? '가이드 NPC: "좋아! 잘했어!"' : '가이드 NPC: "왼쪽 사냥터에서 1~5레벨 슬라임을 처치하세요!"');
-        }
-      }
     });
 
     const keys = {};
@@ -1493,7 +1750,7 @@
       try {
         peer = new Peer(null, { debug: 0 });
         peer.on('open', () => {
-          const conn = peer.connect('slime_kingdom_room_v2');
+          const conn = peer.connect('slime_kingdom_room_v3');
           setupConnection(conn);
           peer.on('connection', (incomingConn) => setupConnection(incomingConn));
         });
@@ -1532,8 +1789,6 @@
       const g = new THREE.Group();
       const body = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 1.2, 14), new THREE.MeshLambertMaterial({ color: 0x9333ea }));
       body.position.y = 0.8; g.add(body);
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 16), new THREE.MeshLambertMaterial({ color: 0xffedd5 }));
-      head.position.y = 1.78; g.add(head);
       scene.add(g);
       const tag = document.createElement('div');
       tag.className = 'float-tag player-tag';
@@ -1552,7 +1807,7 @@
     }
 
     // ==========================================
-    // 9. 메인 애니메이션 루프
+    // 메인 애니메이션 루프
     // ==========================================
     const clock = new THREE.Clock();
     const wipBanner = document.getElementById('wip-banner');
@@ -1574,8 +1829,11 @@
         if (len > 0.05) {
           vx /= Math.max(1, len); vz /= Math.max(1, len);
           const speed = 7.8 * state.speedMultiplier;
-          playerGroup.position.x += vx * speed * dt;
-          playerGroup.position.z += vz * speed * dt;
+          
+          // 카메라 회전각에 맞춰 이동 방향 변환 (사람 시점 이동)
+          const moveDir = new THREE.Vector3(vx, 0, vz).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleY);
+          playerGroup.position.x += moveDir.x * speed * dt;
+          playerGroup.position.z += moveDir.z * speed * dt;
 
           playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
           playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
@@ -1586,7 +1844,7 @@
           }
 
           if (atkTouchId === null) {
-            playerGroup.rotation.y = Math.atan2(vx, vz);
+            playerGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
           }
           playerGroup.position.y = Math.abs(Math.sin(elapsed * 14)) * 0.14;
           playGrassStepSound();
@@ -1625,6 +1883,7 @@
         }
       }
 
+      // 슬라임 AI 및 충돌
       slimes.forEach(s => {
         s.aiTimer -= dt;
         if (s.aiTimer <= 0) { s.moveAngle = Math.random() * Math.PI * 2; s.aiTimer = 1.6 + Math.random() * 2.2; }
@@ -1647,7 +1906,7 @@
           s.attackCooldown = 1.4;
           state.hp = Math.max(0, state.hp - 3);
           state.lastDamageTime = elapsed;
-          playSlimeHitSound();
+          playSound('hit');
           spawnDamagePopup(playerGroup.position, `-3 HP`);
           updatePlayerUI();
           if (state.hp <= 0) {
@@ -1659,28 +1918,51 @@
         updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
       });
 
+      // 바닥에 떨어진 코인 흡수 (자석 모션)
+      for (let i = droppedCoins.length - 1; i >= 0; i--) {
+        const coin = droppedCoins[i];
+        coin.rotation.y += 0.05;
+        const dist = coin.position.distanceTo(playerGroup.position);
+        if (dist < 6.5) {
+          // 캐릭터 쪽으로 부드럽게 끌려옴 (느린 모션 자석 효과)
+          coin.position.lerp(playerGroup.position.clone().add(new THREE.Vector3(0, 0.8, 0)), 0.12);
+          if (dist < 0.9) {
+            scene.remove(coin);
+            droppedCoins.splice(i, 1);
+            state.coins += 1;
+            playSound('coin');
+            updateCoinUI();
+            showToast('💲 코인 획득! (+1)');
+          }
+        }
+      }
+
       Object.values(remotePlayers).forEach(rp => {
         rp.group.position.lerp(rp.targetPos, 0.15);
         updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
       });
 
-      // 카메라 시점 (탑다운 고정 vs 1인칭)
+      // 카메라 뷰 계산 (자유 회전 + 1인칭/탑다운 + 지도 장착 시 줌아웃)
       let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
+      const zoomFactor = state.isMapZoomed ? 2.2 : 1.0;
+
       if (state.camMode === 'firstperson') {
-        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), playerGroup.rotation.y);
-        targetCamX = playerGroup.position.x - forward.x * 2.5;
-        targetCamY = playerGroup.position.y + 2.2;
-        targetCamZ = playerGroup.position.z - forward.z * 2.5;
-        lookX = playerGroup.position.x + forward.x * 5;
-        lookY = playerGroup.position.y + 1.3;
-        lookZ = playerGroup.position.z + forward.z * 5;
+        const camDist = 2.2 * zoomFactor;
+        targetCamX = playerGroup.position.x - Math.sin(cameraAngleY) * camDist;
+        targetCamY = playerGroup.position.y + 1.8 * zoomFactor;
+        targetCamZ = playerGroup.position.z - Math.cos(cameraAngleY) * camDist;
+        lookX = playerGroup.position.x + Math.sin(cameraAngleY) * 6;
+        lookY = playerGroup.position.y + 1.2;
+        lookZ = playerGroup.position.z + Math.cos(cameraAngleY) * 6;
       } else {
-        targetCamX = playerGroup.position.x;
-        targetCamY = 18.5;
-        targetCamZ = playerGroup.position.z + 11.5;
+        const baseDist = 12 * zoomFactor;
+        const height = 19 * zoomFactor * cameraAngleX;
+        targetCamX = playerGroup.position.x - Math.sin(cameraAngleY) * baseDist;
+        targetCamY = height;
+        targetCamZ = playerGroup.position.z + Math.cos(cameraAngleY) * baseDist;
         lookX = playerGroup.position.x;
         lookY = 0.5;
-        lookZ = playerGroup.position.z - 0.5;
+        lookZ = playerGroup.position.z;
       }
 
       camera.position.x += (targetCamX - camera.position.x) * 0.15;
