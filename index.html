@@ -224,6 +224,7 @@
       pointer-events: none;
     }
 
+    /* 장착한 지도 동그라미 아이콘 */
     #equipped-map-badge {
       position: fixed;
       left: 16px;
@@ -246,6 +247,80 @@
     @keyframes pulseMap {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.08); }
+    }
+
+    /* 화면 정중앙 네모난 미니맵 팝업 창 */
+    #map-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 800;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+    .map-popup-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 3px solid #ffd54f;
+      border-radius: 20px;
+      width: 85vw;
+      max-width: 520px;
+      height: 72vh;
+      max-height: 400px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+    .map-popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: rgba(245, 158, 11, 0.2);
+      border-bottom: 2px solid #ffd54f;
+      color: #ffd54f;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .map-popup-body {
+      flex: 1;
+      position: relative;
+      background: #2e7d32;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .minimap-canvas-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .minimap-content {
+      position: absolute;
+      width: 90%;
+      height: 85%;
+      border: 2px dashed rgba(255,255,255,0.4);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+    }
+    .map-zone-tag {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid #ffd54f;
+      padding: 6px 12px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
     }
 
     #wip-banner {
@@ -524,6 +599,7 @@
       text-align: center;
       font-weight: 800;
       text-shadow: 0 1px 3px #000, 0 0 2px #000;
+      transition: opacity 0.2s;
     }
     .player-tag {
       display: flex;
@@ -662,7 +738,23 @@
   <div id="quest-widget">📜 슬라임 5마리 처치하기: <span id="quest-count-num">0</span>/5</div>
 
   <!-- 장착한 지도 아이콘 -->
-  <div id="equipped-map-badge" title="장착된 지도 (클릭 시 맵 전체 보기)">🗺️</div>
+  <div id="equipped-map-badge" title="장착된 지도 (클릭 시 미니맵 팝업)">🗺️</div>
+
+  <!-- 화면 정중앙 네모난 미니맵 팝업 창 -->
+  <div id="map-modal">
+    <div class="map-popup-box">
+      <div class="map-popup-header">
+        <span>🗺️ 왕국 & 사냥터 전체 지도</span>
+        <button class="close-btn" onclick="closeMapModal()">✕</button>
+      </div>
+      <div class="map-popup-body">
+        <div class="minimap-content">
+          <div class="map-zone-tag">⬅️ 슬라임 사냥터</div>
+          <div class="map-zone-tag" style="border-color:#ffd54f;">👑 중앙 왕국</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 퀘스트 대화창 팝업 -->
   <div id="dialog-modal">
@@ -720,7 +812,7 @@
           <div class="item-icon">🗺️</div>
           <div class="item-info">
             <h4>왕국 지도</h4>
-            <p>효과: 맵 전체 디테일 뷰</p>
+            <p>효과: 미니맵 팝업 보기</p>
           </div>
         </div>
         <button class="equip-action-btn" id="btn-equip-map" onclick="toggleEquip('map')">장착</button>
@@ -756,10 +848,10 @@
         <button class="close-btn" onclick="closePanels()">✕</button>
       </div>
       <ul class="guide-list">
-        <li>1. 화면 드래그로 시점(위,아래,좌,우) 회전</li>
-        <li>2. 왼쪽 조이스틱 이동 / 오른쪽 조이스틱 공격</li>
-        <li>3. 가이드 NPC에게 말을 걸어 퀘스트 클리어</li>
-        <li>4. 인벤토리에서 아이템 최대 2개 장착 가능</li>
+        <li>1. 화면 드래그로 시점(하늘 위까지) 자유 회전</li>
+        <li>2. 두 손가락 핀치 줌으로 화면 확대/축소 가능</li>
+        <li>3. 왼쪽 조이스틱 이동 / 오른쪽 조이스틱 공격</li>
+        <li>4. 가이드 NPC에게 말을 걸어 퀘스트 클리어</li>
       </ul>
     </div>
 
@@ -904,12 +996,12 @@
     }
 
     // ==========================================
-    // 플레이어 및 퀘스트 상태 관리
+    // 플레이어 상태 관리
     // ==========================================
     const STORAGE_KEY = 'kingdom_3d_player_nickname';
     const USED_NAMES_KEY = 'kingdom_3d_used_names';
     const COINS_KEY = 'kingdom_3d_player_coins';
-    const STATS_KEY = 'kingdom_3d_player_stats_v3';
+    const STATS_KEY = 'kingdom_3d_player_stats_v4';
 
     function getSavedStats() {
       try {
@@ -945,7 +1037,7 @@
       questStage: 0,
       questProgress: 0,
       camMode: 'topdown',
-      isMapZoomed: false,
+      zoomDistance: 1.0, // 핀치 줌 배율
       lastDamageTime: -10,
       lastRegenTick: 0
     };
@@ -988,7 +1080,6 @@
       } else {
         mapBtn.textContent = '장착'; mapBtn.classList.remove('equipped');
         mapBadge.style.display = 'none';
-        state.isMapZoomed = false;
       }
     }
 
@@ -1057,7 +1148,7 @@
     });
 
     // ==========================================
-    // Three.js 3D 월드 (안전한 생성 및 빽빽한 풀)
+    // Three.js 3D 월드 (왕국 & 사냥터 완벽 구성)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
@@ -1094,21 +1185,10 @@
     scene.add(ground);
 
     const borderMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
-    const topWall = new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat);
-    topWall.position.set(-32, 0.75, MAP_MIN_Z - 1);
-    scene.add(topWall);
-
-    const bottomWall = new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat);
-    bottomWall.position.set(-32, 0.75, MAP_MAX_Z + 1);
-    scene.add(bottomWall);
-
-    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat);
-    leftWall.position.set(MAP_MIN_X - 1, 0.75, 0);
-    scene.add(leftWall);
-
-    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat);
-    rightWall.position.set(MAP_MAX_X + 1, 0.75, 0);
-    scene.add(rightWall);
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MIN_Z - 1) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MAX_Z + 1) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MIN_X - 1, 0.75, 0) }));
+    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MAX_X + 1, 0.75, 0) }));
 
     const huntZone = new THREE.Mesh(
       new THREE.PlaneGeometry(50, 52),
@@ -1126,7 +1206,7 @@
     road.position.set(0, 0.03, 7);
     scene.add(road);
 
-    // 풀 650개 꽉 채우기
+    // 풀 650개 배치
     const grassBladeGeo = new THREE.ConeGeometry(0.18, 0.85, 4);
     const grassMat1 = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
     const grassMat2 = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
@@ -1185,19 +1265,13 @@
     const archFrame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.8, 0.8), goldMat);
     archFrame.position.set(0, 2.4, 3.45);
     kingdomGroup.add(archFrame);
-
-    const goldGateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
-    goldGateLeft.position.set(-0.92, 2.1, 3.52);
-    kingdomGroup.add(goldGateLeft);
-
-    const goldGateRight = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
-    goldGateRight.position.set(0.92, 2.1, 3.52);
-    kingdomGroup.add(goldGateRight);
+    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(-0.92, 2.1, 3.52) }));
+    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(0.92, 2.1, 3.52) }));
 
     scene.add(kingdomGroup);
 
     // ==========================================
-    // NPC 및 표지판
+    // NPC 및 표지판 (이름표 가시거리 최적화 적용)
     // ==========================================
     const clickableNPCs = [];
     const labelsData = [];
@@ -1221,7 +1295,7 @@
       tag.textContent = '🛡️ 경비원';
       tag.addEventListener('click', () => { playSound('click'); showToast('🛡️ 경비원: "왕국을 지키는 든든한 경비원입니다."'); });
       document.getElementById('floating-labels').appendChild(tag);
-      labelsData.push({ obj: g, el: tag, offset: 2.75 });
+      labelsData.push({ obj: g, el: tag, offset: 2.75, maxDist: 18 }); // 18m 이내에서만 표시
     }
 
     createGuard(-7.5, -2.0);
@@ -1245,7 +1319,7 @@
     guideTag.textContent = '가이드 NPC';
     guideTag.addEventListener('click', () => interactWithGuideNPC());
     document.getElementById('floating-labels').appendChild(guideTag);
-    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55 });
+    labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55, maxDist: 22 }); // 22m 이내에서만 표시
 
     function createSign(x, rotY, title, sub) {
       const signGroup = new THREE.Group();
@@ -1274,7 +1348,7 @@
     createSign(-24, 0.25, '⬅️ 1레벨~5레벨 사냥터', '(더 왼쪽으로 가면 슬라임 사냥터)');
 
     // ==========================================
-    // 내 캐릭터 & 조준선
+    // 내 캐릭터
     // ==========================================
     const playerGroup = new THREE.Group();
     playerGroup.position.set(0, 0, 9);
@@ -1342,7 +1416,7 @@
     }
 
     // ==========================================
-    // 가이드 NPC 퀘스트 대화
+    // 가이드 NPC 대화 및 퀘스트
     // ==========================================
     function interactWithGuideNPC() {
       playSound('click');
@@ -1409,7 +1483,7 @@
     }
 
     // ==========================================
-    // 슬라임 & 코인 드롭 (자석 흡수)
+    // 슬라임 및 코인 드롭
     // ==========================================
     const slimes = [];
     const droppedCoins = [];
@@ -1458,7 +1532,7 @@
     }
 
     // ==========================================
-    // 조이스틱 및 화면 드래그 시점 회전
+    // 조이스틱 및 이동 방향 오류 수정 완료
     // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
@@ -1580,11 +1654,15 @@
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
 
-    // 카메라 사람처럼 자유 회전
+    // ==========================================
+    // 카메라 자유 회전 (하늘 위까지 보기 가능) & 핀치 줌 (확대/축소)
+    // ==========================================
     let isDraggingScreen = false;
     let prevMouseX = 0; let prevMouseY = 0;
     let cameraAngleY = 0;
-    let cameraAngleX = 0.45;
+    let cameraAngleX = 0.45; // 하늘 위까지 볼 수 있도록 범위 확장 (-0.8 ~ 1.5)
+
+    let initialPinchDist = null;
 
     renderer.domElement.addEventListener('pointerdown', (e) => {
       if (!state.started) return;
@@ -1600,11 +1678,25 @@
       const dy = e.clientY - prevMouseY;
       cameraAngleY -= dx * 0.005;
       cameraAngleX += dy * 0.005;
-      cameraAngleX = Math.max(0.1, Math.min(1.35, cameraAngleX));
+      cameraAngleX = Math.max(-0.8, Math.min(1.5, cameraAngleX)); // 하늘 위까지 완전히 볼 수 있도록 한계 해제
       prevMouseX = e.clientX; prevMouseY = e.clientY;
     });
 
-    window.addEventListener('pointerup', () => { isDraggingScreen = false; });
+    window.addEventListener('pointerup', () => { isDraggingScreen = false; initialPinchDist = null; });
+
+    // 두 손가락 핀치 줌 이벤트
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        if (!initialPinchDist) { initialPinchDist = dist; }
+        else {
+          const diff = dist - initialPinchDist;
+          state.zoomDistance -= diff * 0.003;
+          state.zoomDistance = Math.max(0.5, Math.min(2.5, state.zoomDistance)); // 확대/축소 배율 제한
+          initialPinchDist = dist;
+        }
+      }
+    }, { passive: true });
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -1623,11 +1715,17 @@
       }
     });
 
+    // 지도 동그라미 클릭 시 정중앙 네모 미니맵 팝업
     document.getElementById('equipped-map-badge').addEventListener('click', () => {
       playSound('map');
-      state.isMapZoomed = !state.isMapZoomed;
-      showToast(state.isMapZoomed ? '🗺️ 왕국 지도 활성화: 맵 전체 뷰' : '🗺️ 지도를 접었습니다.');
+      document.getElementById('map-modal').style.display = 'flex';
+      showToast('🗺️ 왕국 전체 미니맵 열기');
     });
+
+    function closeMapModal() {
+      playSound('click');
+      document.getElementById('map-modal').style.display = 'none';
+    }
 
     document.getElementById('up-hp-btn').addEventListener('click', () => {
       playSound('click');
@@ -1743,7 +1841,7 @@
       try {
         peer = new Peer(null, { debug: 0 });
         peer.on('open', () => {
-          const conn = peer.connect('slime_kingdom_room_v3');
+          const conn = peer.connect('slime_kingdom_room_v4');
           setupConnection(conn);
           peer.on('connection', (incomingConn) => setupConnection(incomingConn));
         });
@@ -1790,7 +1888,12 @@
       return { group: g, targetPos: new THREE.Vector3(), labelEl: tag };
     }
 
-    function updateScreenLabel(worldPos, offsetY, el) {
+    function updateScreenLabel(worldPos, offsetY, maxDist, el) {
+      const distToPlayer = playerGroup.position.distanceTo(worldPos);
+      if (maxDist && distToPlayer > maxDist) {
+        el.style.display = 'none';
+        return;
+      }
       const v = worldPos.clone(); v.y += offsetY; v.project(camera);
       if (v.z > 1) { el.style.display = 'none'; return; }
       el.style.display = '';
@@ -1812,6 +1915,7 @@
       const elapsed = clock.getElapsedTime();
 
       if (state.started) {
+        // 조이스틱 방향 반전 오류 수정 (시점 회전각에 맞춰 정확하게 반영)
         let vx = moveInput.x; let vz = moveInput.z;
         if (keys['KeyA'] || keys['ArrowLeft']) vx -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) vx += 1;
@@ -1822,6 +1926,8 @@
         if (len > 0.05) {
           vx /= Math.max(1, len); vz /= Math.max(1, len);
           const speed = 7.8 * state.speedMultiplier;
+          
+          // 카메라 시점 각도 기준 정확한 이동 벡터 산출
           const moveDir = new THREE.Vector3(vx, 0, vz).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleY);
           playerGroup.position.x += moveDir.x * speed * dt;
           playerGroup.position.z += moveDir.z * speed * dt;
@@ -1903,7 +2009,7 @@
             updatePlayerUI();
           }
         }
-        updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
+        updateScreenLabel(s.group.position, 1.55 + jumpHeight, 25, s.labelEl);
       });
 
       for (let i = droppedCoins.length - 1; i >= 0; i--) {
@@ -1925,11 +2031,11 @@
 
       Object.values(remotePlayers).forEach(rp => {
         rp.group.position.lerp(rp.targetPos, 0.15);
-        updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
+        updateScreenLabel(rp.group.position, 2.75, 40, rp.labelEl);
       });
 
       let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
-      const zoomFactor = state.isMapZoomed ? 2.2 : 1.0;
+      const zoomFactor = state.zoomDistance;
 
       if (state.camMode === 'firstperson') {
         const camDist = 2.2 * zoomFactor;
@@ -1937,11 +2043,11 @@
         targetCamY = playerGroup.position.y + 1.8 * zoomFactor;
         targetCamZ = playerGroup.position.z - Math.cos(cameraAngleY) * camDist;
         lookX = playerGroup.position.x + Math.sin(cameraAngleY) * 6;
-        lookY = playerGroup.position.y + 1.2;
+        lookY = playerGroup.position.y + 1.2 + (cameraAngleX * 3);
         lookZ = playerGroup.position.z + Math.cos(cameraAngleY) * 6;
       } else {
         const baseDist = 12 * zoomFactor;
-        const height = 19 * zoomFactor * cameraAngleX;
+        const height = (19 + (cameraAngleX * 12)) * zoomFactor;
         targetCamX = playerGroup.position.x - Math.sin(cameraAngleY) * baseDist;
         targetCamY = height;
         targetCamZ = playerGroup.position.z + Math.cos(cameraAngleY) * baseDist;
@@ -1955,8 +2061,8 @@
       camera.position.z += (targetCamZ - camera.position.z) * 0.15;
       camera.lookAt(lookX, lookY, lookZ);
 
-      if (state.started) updateScreenLabel(playerGroup.position, 2.75, playerLabelEl);
-      labelsData.forEach(g => updateScreenLabel(g.obj.position, g.offset, g.el));
+      if (state.started) updateScreenLabel(playerGroup.position, 2.75, 100, playerLabelEl);
+      labelsData.forEach(g => updateScreenLabel(g.obj.position, g.offset, g.maxDist, g.el));
 
       renderer.render(scene, camera);
     }
