@@ -207,7 +207,6 @@
       transition: width 0.25s;
     }
 
-    /* 오른쪽 위 퀘스트 위젯 */
     #quest-widget {
       position: fixed;
       top: 65px;
@@ -225,7 +224,6 @@
       pointer-events: none;
     }
 
-    /* 장착된 지도 동그라미 아이콘 (강화 버튼 아래) */
     #equipped-map-badge {
       position: fixed;
       left: 16px;
@@ -295,7 +293,6 @@
       transform: translateX(-50%) translateY(4px);
     }
 
-    /* 화면 가운데 퀘스트 대화창 팝업 */
     #dialog-modal {
       display: none;
       position: fixed;
@@ -661,13 +658,13 @@
   <div id="wip-banner">🚧 제작중...</div>
   <div id="toast-msg"></div>
 
-  <!-- 퀘스트 현황 위젯 (오른쪽 위) -->
+  <!-- 퀘스트 현황 위젯 -->
   <div id="quest-widget">📜 슬라임 5마리 처치하기: <span id="quest-count-num">0</span>/5</div>
 
-  <!-- 장착한 지도 아이콘 (강화 버튼 아래) -->
+  <!-- 장착한 지도 아이콘 -->
   <div id="equipped-map-badge" title="장착된 지도 (클릭 시 맵 전체 보기)">🗺️</div>
 
-  <!-- 화면 가운데 퀘스트 대화창 팝업 -->
+  <!-- 퀘스트 대화창 팝업 -->
   <div id="dialog-modal">
     <div class="dialog-box">
       <h3 id="dialog-title">가이드 NPC</h3>
@@ -708,7 +705,6 @@
         <span>💲 보유 코인</span>
         <span id="coin-count-text">0 코인</span>
       </div>
-      <!-- 나무 막대기 슬롯 -->
       <div class="item-slot">
         <div class="item-left">
           <div class="item-icon">🪵</div>
@@ -719,7 +715,6 @@
         </div>
         <button class="equip-action-btn" id="btn-equip-stick" onclick="toggleEquip('stick')">장착</button>
       </div>
-      <!-- 지도 슬롯 -->
       <div class="item-slot">
         <div class="item-left">
           <div class="item-icon">🗺️</div>
@@ -944,10 +939,10 @@
       coins: parseInt(localStorage.getItem(COINS_KEY) || '0', 10),
       speedMultiplier: savedStats.spdMultiplier,
       speedLevel: savedStats.spdLevel,
-      equipped: savedStats.equipped || [], // 최대 2개 ('stick', 'map')
+      equipped: savedStats.equipped || [],
       isAttacking: false,
       attackTimer: 0,
-      questStage: 0, // 0: 시작전, 1: 5마리 잡기 진행중, 2: 5마리 완료, 3: 5렙 달성 진행중, 4: 완료
+      questStage: 0,
       questProgress: 0,
       camMode: 'topdown',
       isMapZoomed: false,
@@ -977,7 +972,6 @@
       document.getElementById('weapon-dmg-text').textContent = `공격력: +${state.damage}`;
       document.getElementById('equip-count').textContent = state.equipped.length;
 
-      // 장착 버튼 상태 동기화
       const stickBtn = document.getElementById('btn-equip-stick');
       const mapBtn = document.getElementById('btn-equip-map');
       const mapBadge = document.getElementById('equipped-map-badge');
@@ -1063,7 +1057,7 @@
     });
 
     // ==========================================
-    // Three.js 3D 월드 (풀 매우 풍성 + 왕국 & 사냥터 디테일)
+    // Three.js 3D 월드 (안전한 생성 및 빽빽한 풀)
     // ==========================================
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
@@ -1090,7 +1084,6 @@
     const MAP_MIN_Z = -35;
     const MAP_MAX_Z = 35;
 
-    // 바닥 초원
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(190, 85),
       new THREE.MeshLambertMaterial({ color: 0x4caf50 })
@@ -1100,14 +1093,23 @@
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // 테두리 울타리
     const borderMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
-    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MIN_Z - 1) }));
-    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat), { position: new THREE.Vector3(-32, 0.75, MAP_MAX_Z + 1) }));
-    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MIN_X - 1, 0.75, 0) }));
-    scene.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat), { position: new THREE.Vector3(MAP_MAX_X + 1, 0.75, 0) }));
+    const topWall = new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat);
+    topWall.position.set(-32, 0.75, MAP_MIN_Z - 1);
+    scene.add(topWall);
 
-    // 왼쪽 슬라임 사냥터 바닥
+    const bottomWall = new THREE.Mesh(new THREE.BoxGeometry(180, 1.5, 1), borderMat);
+    bottomWall.position.set(-32, 0.75, MAP_MAX_Z + 1);
+    scene.add(bottomWall);
+
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat);
+    leftWall.position.set(MAP_MIN_X - 1, 0.75, 0);
+    scene.add(leftWall);
+
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 72), borderMat);
+    rightWall.position.set(MAP_MAX_X + 1, 0.75, 0);
+    scene.add(rightWall);
+
     const huntZone = new THREE.Mesh(
       new THREE.PlaneGeometry(50, 52),
       new THREE.MeshLambertMaterial({ color: 0x3b9440 })
@@ -1116,7 +1118,6 @@
     huntZone.position.set(-88, 0.02, 0);
     scene.add(huntZone);
 
-    // 왕국 앞 돌길
     const road = new THREE.Mesh(
       new THREE.PlaneGeometry(14, 26),
       new THREE.MeshLambertMaterial({ color: 0xe5dec9 })
@@ -1125,7 +1126,7 @@
     road.position.set(0, 0.03, 7);
     scene.add(road);
 
-    // 풀(잔디 뭉치)을 훨씬 빽빽하고 꽉 채우기 (650개)
+    // 풀 650개 꽉 채우기
     const grassBladeGeo = new THREE.ConeGeometry(0.18, 0.85, 4);
     const grassMat1 = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
     const grassMat2 = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
@@ -1145,7 +1146,7 @@
     }
 
     // ==========================================
-    // 디테일한 중앙 왕국 (진입 불가)
+    // 왕국 3D 모델
     // ==========================================
     const kingdomGroup = new THREE.Group();
     kingdomGroup.position.set(0, 0, -14);
@@ -1184,8 +1185,14 @@
     const archFrame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.8, 0.8), goldMat);
     archFrame.position.set(0, 2.4, 3.45);
     kingdomGroup.add(archFrame);
-    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(-0.92, 2.1, 3.52) }));
-    kingdomGroup.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat), { position: new THREE.Vector3(0.92, 2.1, 3.52) }));
+
+    const goldGateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
+    goldGateLeft.position.set(-0.92, 2.1, 3.52);
+    kingdomGroup.add(goldGateLeft);
+
+    const goldGateRight = new THREE.Mesh(new THREE.BoxGeometry(1.75, 4.2, 0.9), goldMat);
+    goldGateRight.position.set(0.92, 2.1, 3.52);
+    kingdomGroup.add(goldGateRight);
 
     scene.add(kingdomGroup);
 
@@ -1220,7 +1227,6 @@
     createGuard(-7.5, -2.0);
     createGuard(7.5, -2.0);
 
-    // 왕국 오른쪽 옆에 가이드 NPC (X: 18)
     const guideGroup = new THREE.Group();
     guideGroup.position.set(18, 0, -1.5);
     const gBody = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.48, 1.25, 12), new THREE.MeshLambertMaterial({ color: 0xb45309 }));
@@ -1238,7 +1244,7 @@
     guideTag.className = 'float-tag npc-tag';
     guideTag.textContent = '가이드 NPC';
     guideTag.addEventListener('click', () => interactWithGuideNPC());
-    document.getElementById('floating-labels').appendChild(tag = guideTag);
+    document.getElementById('floating-labels').appendChild(guideTag);
     labelsData.push({ obj: guideGroup, el: guideTag, offset: 2.55 });
 
     function createSign(x, rotY, title, sub) {
@@ -1336,7 +1342,7 @@
     }
 
     // ==========================================
-    // 가이드 NPC 대화 및 퀘스트 로직
+    // 가이드 NPC 퀘스트 대화
     // ==========================================
     function interactWithGuideNPC() {
       playSound('click');
@@ -1352,10 +1358,10 @@
         btnEl.textContent = '확인';
         btnEl.onclick = () => {
           playSound('click');
-          state.questStage = 1; // 5마리 잡기 퀘스트 시작
+          state.questStage = 1;
           modal.style.display = 'none';
           updatePlayerUI();
-          showToast('📜 [슬라임 5마리 처치하기] 퀘스트가 시작되었습니다!');
+          showToast('📜 [슬라임 5마리 처치하기] 퀘스트 시작!');
         };
         modal.style.display = 'flex';
       } else if (state.questStage === 1) {
@@ -1365,14 +1371,13 @@
           btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; };
           modal.style.display = 'flex';
         } else {
-          // 5마리 완료 보상 지급
           state.coins += 10;
           updateCoinUI();
           textEl.textContent = '좋아 잘했어! 보상으로 10코인을 줄게요.';
           btnEl.textContent = '다음 퀘스트 하기';
           btnEl.onclick = () => {
             playSound('click');
-            state.questStage = 3; // 5레벨 달성 퀘스트 시작
+            state.questStage = 3;
             textEl.textContent = '이제 5레벨 까지 레벨업 하기 퀘스트입니다!';
             btnEl.textContent = '확인';
             btnEl.onclick = () => { playSound('click'); modal.style.display = 'none'; updatePlayerUI(); };
@@ -1404,7 +1409,7 @@
     }
 
     // ==========================================
-    // 슬라임 & 바닥에 떨어지는 코인 (자석 흡수) 시스템
+    // 슬라임 & 코인 드롭 (자석 흡수)
     // ==========================================
     const slimes = [];
     const droppedCoins = [];
@@ -1438,7 +1443,6 @@
     for (let i = 0; i < 6; i++) spawnSlime();
     setInterval(() => { if (state.started) spawnSlime(); }, 8000);
 
-    // 슬라임 처치 시 100% 코인 드롭
     function dropCoinAt(pos) {
       const cGroup = new THREE.Group();
       const coinMesh = new THREE.Mesh(
@@ -1454,7 +1458,7 @@
     }
 
     // ==========================================
-    // 조이스틱 & 카메라 자유 회전 (위,아래,좌,우 사람처럼)
+    // 조이스틱 및 화면 드래그 시점 회전
     // ==========================================
     const moveInput = { x: 0, z: 0 };
     const moveZone = document.getElementById('move-joystick-zone');
@@ -1490,7 +1494,6 @@
     moveZone.addEventListener('pointerup', resetMoveStick);
     moveZone.addEventListener('pointercancel', resetMoveStick);
 
-    // 공격 조이스틱
     const atkZone = document.getElementById('attack-joystick-zone');
     const atkStick = document.getElementById('attack-stick');
     let atkTouchId = null;
@@ -1530,13 +1533,12 @@
               }
             }
 
-            // 경험치 및 레벨업 (필요 경험치: 50 + (lvl-1)*20)
             state.exp += 25;
             const reqExp = getRequiredExp(state.level);
             if (state.exp >= reqExp && state.level < state.maxLevel) {
               state.exp -= reqExp;
               state.level += 1;
-              state.coins += 5; // 레벨업 시 코인 5개 보상
+              state.coins += 5;
               showToast(`🎉 레벨 업! Lv.${state.level} 달성! (+5 코인)`);
             }
             updatePlayerUI();
@@ -1578,17 +1580,14 @@
     atkZone.addEventListener('pointerup', resetAtkStick);
     atkZone.addEventListener('pointercancel', resetAtkStick);
 
-    // ==========================================
-    // 화면 드래그로 사람처럼 카메라 시점 회전 (위,아래,좌,우)
-    // ==========================================
+    // 카메라 사람처럼 자유 회전
     let isDraggingScreen = false;
     let prevMouseX = 0; let prevMouseY = 0;
-    let cameraAngleY = 0; // 좌우 회전각
-    let cameraAngleX = 0.45; // 상하 피치각
+    let cameraAngleY = 0;
+    let cameraAngleX = 0.45;
 
     renderer.domElement.addEventListener('pointerdown', (e) => {
       if (!state.started) return;
-      // 조이스틱 영역 터치는 제외
       if (e.clientX < 180 && e.clientY > window.innerHeight - 180) return;
       if (e.clientX > window.innerWidth - 180 && e.clientY > window.innerHeight - 180) return;
       isDraggingScreen = true;
@@ -1599,17 +1598,14 @@
       if (!isDraggingScreen) return;
       const dx = e.clientX - prevMouseX;
       const dy = e.clientY - prevMouseY;
-
       cameraAngleY -= dx * 0.005;
       cameraAngleX += dy * 0.005;
-      cameraAngleX = Math.max(0.1, Math.min(1.35, cameraAngleX)); // 너무 위/아래로 뒤집히지 않게 제한
-
+      cameraAngleX = Math.max(0.1, Math.min(1.35, cameraAngleX));
       prevMouseX = e.clientX; prevMouseY = e.clientY;
     });
 
     window.addEventListener('pointerup', () => { isDraggingScreen = false; });
 
-    // NPC 클릭 판정
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     renderer.domElement.addEventListener('click', (e) => {
@@ -1627,14 +1623,12 @@
       }
     });
 
-    // 장착한 지도 아이콘 클릭 시 전체 맵 줌 토글
     document.getElementById('equipped-map-badge').addEventListener('click', () => {
       playSound('map');
       state.isMapZoomed = !state.isMapZoomed;
       showToast(state.isMapZoomed ? '🗺️ 왕국 지도 활성화: 맵 전체 뷰' : '🗺️ 지도를 접었습니다.');
     });
 
-    // 강화 버튼 이벤트
     document.getElementById('up-hp-btn').addEventListener('click', () => {
       playSound('click');
       if (state.coins >= 5) {
@@ -1668,7 +1662,6 @@
       }
     });
 
-    // 시점 모드 변경 버튼
     document.getElementById('btn-cam-mode').addEventListener('click', () => {
       playSound('click');
       if (state.camMode === 'topdown') {
@@ -1807,7 +1800,7 @@
     }
 
     // ==========================================
-    // 메인 애니메이션 루프
+    // 메인 루프
     // ==========================================
     const clock = new THREE.Clock();
     const wipBanner = document.getElementById('wip-banner');
@@ -1829,8 +1822,6 @@
         if (len > 0.05) {
           vx /= Math.max(1, len); vz /= Math.max(1, len);
           const speed = 7.8 * state.speedMultiplier;
-          
-          // 카메라 회전각에 맞춰 이동 방향 변환 (사람 시점 이동)
           const moveDir = new THREE.Vector3(vx, 0, vz).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleY);
           playerGroup.position.x += moveDir.x * speed * dt;
           playerGroup.position.z += moveDir.z * speed * dt;
@@ -1838,7 +1829,6 @@
           playerGroup.position.x = Math.max(MAP_MIN_X, Math.min(MAP_MAX_X, playerGroup.position.x));
           playerGroup.position.z = Math.max(MAP_MIN_Z, Math.min(MAP_MAX_Z, playerGroup.position.z));
 
-          // 왕국 성벽 내부 진입 방지
           if (playerGroup.position.x > -15 && playerGroup.position.x < 15 && playerGroup.position.z < -2.0) {
             playerGroup.position.z = -2.0;
           }
@@ -1864,7 +1854,6 @@
         );
         wipBanner.style.display = atEdge ? 'block' : 'none';
 
-        // 피격 후 1초 지나면 0.2초마다 체력 2씩 자동 회복 (+2 ➕️)
         if (state.hp < state.maxHp && (elapsed - state.lastDamageTime) > 1.0) {
           if ((elapsed - state.lastRegenTick) > 0.2) {
             state.lastRegenTick = elapsed;
@@ -1883,7 +1872,6 @@
         }
       }
 
-      // 슬라임 AI 및 충돌
       slimes.forEach(s => {
         s.aiTimer -= dt;
         if (s.aiTimer <= 0) { s.moveAngle = Math.random() * Math.PI * 2; s.aiTimer = 1.6 + Math.random() * 2.2; }
@@ -1918,13 +1906,11 @@
         updateScreenLabel(s.group.position, 1.55 + jumpHeight, s.labelEl);
       });
 
-      // 바닥에 떨어진 코인 흡수 (자석 모션)
       for (let i = droppedCoins.length - 1; i >= 0; i--) {
         const coin = droppedCoins[i];
         coin.rotation.y += 0.05;
         const dist = coin.position.distanceTo(playerGroup.position);
         if (dist < 6.5) {
-          // 캐릭터 쪽으로 부드럽게 끌려옴 (느린 모션 자석 효과)
           coin.position.lerp(playerGroup.position.clone().add(new THREE.Vector3(0, 0.8, 0)), 0.12);
           if (dist < 0.9) {
             scene.remove(coin);
@@ -1942,7 +1928,6 @@
         updateScreenLabel(rp.group.position, 2.75, rp.labelEl);
       });
 
-      // 카메라 뷰 계산 (자유 회전 + 1인칭/탑다운 + 지도 장착 시 줌아웃)
       let targetCamX, targetCamY, targetCamZ, lookX, lookY, lookZ;
       const zoomFactor = state.isMapZoomed ? 2.2 : 1.0;
 
